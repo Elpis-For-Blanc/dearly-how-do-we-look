@@ -83,6 +83,22 @@ body.ownerMode .bar span:after{content:" · 주인 전용";color:var(--u)}
 body.exporting #sheet{transform:none!important}
 body.exporting .previewStage{overflow:visible!important}
 
+
+.pngPreviewDialog{
+  width:min(720px,calc(100vw - 20px));max-height:92vh;border:0;padding:0;
+  border-radius:18px;box-shadow:0 24px 80px rgba(55,35,45,.28)
+}
+.pngPreviewDialog::backdrop{background:rgba(43,31,37,.45);backdrop-filter:blur(4px)}
+.pngPreviewCard{padding:16px;background:#fff}
+.pngPreviewHead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:12px}
+.pngPreviewHead strong{font-size:16px}
+.pngPreviewHead p{margin:4px 0 0;color:var(--muted);font-size:11px;line-height:1.5}
+.pngPreviewImageWrap{max-height:65vh;overflow:auto;border:1px solid var(--line);border-radius:12px;background:#f8f5f7;padding:8px}
+.pngPreviewImageWrap img{display:block;width:100%;height:auto;border-radius:8px}
+.pngPreviewActions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+#png.preparing{opacity:.6;cursor:wait}
+@media(max-width:600px){.pngPreviewActions{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -158,6 +174,27 @@ body.exporting .previewStage{overflow:visible!important}
 </main>
 <div id="toast" class="toast"></div>
 
+<dialog id="pngPreviewDialog" class="pngPreviewDialog">
+  <div class="pngPreviewCard">
+    <div class="pngPreviewHead">
+      <div>
+        <strong>PNG가 준비됐어요 ♡</strong>
+        <p>자동 저장이 막히면 이미지를 길게 눌러 저장해 주세요.</p>
+      </div>
+      <button id="closePngPreview" type="button" class="x" aria-label="닫기">×</button>
+    </div>
+    <div class="pngPreviewImageWrap">
+      <img id="pngPreviewImage" alt="완성된 페어틀 PNG">
+    </div>
+    <div class="pngPreviewActions">
+      <button id="downloadPreparedPng" type="button" class="btn primary">PNG 다운로드</button>
+      <button id="sharePreparedPng" type="button" class="btn">공유/저장</button>
+    </div>
+    <p class="privacyNote">모바일에서 다운로드가 막히면 위 이미지를 길게 눌러 저장할 수 있습니다.</p>
+  </div>
+</dialog>
+
+
 <dialog id="linkDialog" class="linkDialog">
   <form method="dialog" class="linkDialogCard">
     <div class="linkDialogHead">
@@ -214,6 +251,11 @@ let answers=[],meterRatings=[];
 let currentSheetOwnerUid="";
 let currentOwnerResponses=[];
 let selectedOwnerResponseId="";
+let ownerPngBlob=null;
+let ownerPngUrl="";
+let ownerPngFilename="";
+let ownerPngPreparing=false;
+let ownerPngGeneration=0;
 
 let qs=['이 페어의 첫인상은?','지금은 어떻게 보여?','한 단어로 표현한다면?','가장 먼저 떠오르는 색은?','가장 어울리는 계절은?','둘의 관계에서 제일 좋아하는 부분','가장 기억에 남는 설정이나 장면','먼저 좋아했을 것 같은 쪽','질투가 더 많아 보이는 쪽','상대를 더 많이 봐주는 쪽','어울리는 노래 한 곡','이 둘은 결국 ______할 것 같다','이 페어의 최고 매력 포인트','한 줄 평'];
 let meters=['달달함','애틋함','안정감','긴장감','집착','개그','서사맛'];
@@ -614,6 +656,130 @@ function renderOwnerResponseList(){
     list.appendChild(b);
   });
 }
+
+function clearOwnerPngCache(){
+  ownerPngBlob=null;
+  ownerPngFilename="";
+  if(ownerPngUrl){
+    try{URL.revokeObjectURL(ownerPngUrl)}catch(e){}
+    ownerPngUrl="";
+  }
+}
+
+function setOwnerPngPreparing(preparing){
+  ownerPngPreparing=preparing;
+  const btn=$('#png');
+  if(!btn)return;
+  btn.classList.toggle('preparing',preparing);
+  btn.disabled=preparing;
+  btn.textContent=preparing?'PNG 준비 중…':'PNG 저장';
+}
+
+async function renderSheetCanvasForOwner(){
+  const sheetEl=$('#sheet');
+  if(!sheetEl)throw new Error('sheet-not-found');
+
+  const oldTransform=sheetEl.style.transform;
+  const oldMargin=sheetEl.style.marginBottom;
+
+  document.body.classList.add('exporting');
+  sheetEl.style.transform='none';
+  sheetEl.style.marginBottom='0';
+
+  try{
+    await waitForSheetAssets(sheetEl);
+    const targetWidth=Math.max(720,Number($('#width')?.value||1080));
+    const scale=targetWidth/Math.max(1,sheetEl.offsetWidth);
+
+    return await html2canvas(sheetEl,{
+      scale,
+      useCORS:true,
+      allowTaint:false,
+      backgroundColor:null,
+      logging:false,
+      imageTimeout:5000,
+      scrollX:0,
+      scrollY:-window.scrollY
+    });
+  }finally{
+    document.body.classList.remove('exporting');
+    sheetEl.style.transform=oldTransform;
+    sheetEl.style.marginBottom=oldMargin;
+    setTimeout(fitPreview,0);
+  }
+}
+
+async function prepareOwnerPng(){
+  if(!ownerMode||!selectedOwnerResponseId||typeof html2canvas!=='function')return;
+
+  const generation=++ownerPngGeneration;
+  clearOwnerPngCache();
+  setOwnerPngPreparing(true);
+
+  try{
+    await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+
+    const canvas=await renderSheetCanvasForOwner();
+    const blob=await canvasToBlob(canvas);
+
+    if(generation!==ownerPngGeneration)return;
+
+    ownerPngBlob=blob;
+    ownerPngFilename=safePngName();
+    ownerPngUrl=URL.createObjectURL(blob);
+
+    const img=$('#pngPreviewImage');
+    if(img)img.src=ownerPngUrl;
+  }catch(e){
+    console.error('Owner PNG prepare failed',e);
+    if(generation===ownerPngGeneration){
+      clearOwnerPngCache();
+      toast('PNG 준비에 실패했어요. 답변을 다시 눌러 주세요.');
+    }
+  }finally{
+    if(generation===ownerPngGeneration)setOwnerPngPreparing(false);
+  }
+}
+
+function directPreparedDownload(){
+  if(!ownerPngBlob||!ownerPngUrl)return false;
+
+  const a=document.createElement('a');
+  a.href=ownerPngUrl;
+  a.download=ownerPngFilename||safePngName();
+  a.rel='noopener';
+  a.style.display='none';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  return true;
+}
+
+function showPreparedPngDialog(){
+  if(!ownerPngUrl)return;
+  $('#pngPreviewImage').src=ownerPngUrl;
+  const dialog=$('#pngPreviewDialog');
+  if(dialog?.showModal)dialog.showModal();
+}
+
+async function sharePreparedPng(){
+  if(!ownerPngBlob)return toast('PNG가 아직 준비되지 않았어요.');
+
+  try{
+    const file=new File([ownerPngBlob],ownerPngFilename||safePngName(),{type:'image/png'});
+
+    if(navigator.share&&(!navigator.canShare||navigator.canShare({files:[file]}))){
+      await navigator.share({files:[file],title:'우리 페어, 어떻게 보여?'});
+      return;
+    }
+  }catch(e){
+    if(e?.name==='AbortError')return;
+    console.error('PNG share failed',e);
+  }
+
+  if(!directPreparedDownload())toast('PNG를 저장하지 못했어요.');
+}
+
 function showOwnerResponse(r){
   if(!r)return;
 
@@ -621,17 +787,17 @@ function showOwnerResponse(r){
   answers=qs.map((_,i)=>String(r.answers?.[i]||''));
   meterRatings=meters.map((_,i)=>Math.max(0,Math.min(5,Number(r.ratings?.[i]||0))));
 
-  // 주인 화면에서도 선택한 답변을 틀 미리보기에 바로 반영
   renderQ();
   renderM();
 
   $('#selectedResponseName').textContent=responseDisplayName(r);
   $('#selectedResponseMeta').textContent=`${formatResponseTime(r.submittedAt||r.updatedAt)} · 작성 ${responseAnswerCount(r)}개`;
-  renderOwnerResponseList();
 
-  // 모바일에서 답변을 고르면 미리보기 위치가 너무 멀 수 있어,
-  // 렌더링 후 레이아웃을 다시 맞춰 줍니다.
+  renderOwnerResponseList();
   setTimeout(fitPreview,0);
+
+  // 답변 선택 즉시 PNG를 미리 만들어 둠
+  prepareOwnerPng();
 }
 async function loadOwnerResponses(){
   const list=$('#responseList');
@@ -699,6 +865,7 @@ async function enterOwnerMode(sheetData){
   $('#share').hidden=true;
   $('#png').hidden=false;
   $('#png').disabled=false;
+  $('#png').textContent='PNG 저장';
   $('#reset').hidden=true;
   $('#siteGuide').textContent='주인 전용 답변함이에요. 트친들이 보낸 답변은 이 페이지에서만 확인할 수 있어요 ♡';
 
@@ -805,23 +972,40 @@ async function save(){
     return;
   }
 
-  const sheetEl=$('#sheet');
-  const widthEl=$('#width');
-  const pngBtn=$('#png');
+  // 주인용 답변함: 미리 만들어 둔 PNG를 버튼 클릭 순간 바로 다운로드
+  if(ownerMode){
+    if(!selectedOwnerResponseId){
+      if(currentOwnerResponses.length){
+        showOwnerResponse(currentOwnerResponses[0]);
+        toast('PNG를 준비하고 있어요. 잠시만 기다려 주세요.');
+      }else{
+        toast('저장할 답변이 아직 없어요.');
+      }
+      return;
+    }
 
-  if(!sheetEl){
-    toast('저장할 틀을 찾지 못했어요.');
+    if(ownerPngPreparing){
+      toast('PNG를 준비하고 있어요. 잠시만 기다려 주세요.');
+      return;
+    }
+
+    if(!ownerPngBlob||!ownerPngUrl){
+      prepareOwnerPng();
+      toast('PNG를 다시 준비하고 있어요. 잠시 후 눌러 주세요.');
+      return;
+    }
+
+    directPreparedDownload();
+    showPreparedPngDialog();
     return;
   }
 
-  // 주인 답변함에서는 선택된 답변이 있어야 저장
-  if(ownerMode&&!selectedOwnerResponseId){
-    if(currentOwnerResponses.length){
-      showOwnerResponse(currentOwnerResponses[0]);
-    }else{
-      toast('저장할 답변이 아직 없어요.');
-      return;
-    }
+  // 만드는 사람 / 트친 작성 화면
+  const sheetEl=$('#sheet');
+  const pngBtn=$('#png');
+  if(!sheetEl){
+    toast('저장할 틀을 찾지 못했어요.');
+    return;
   }
 
   const oldTransform=sheetEl.style.transform;
@@ -839,8 +1023,7 @@ async function save(){
 
   try{
     await waitForSheetAssets(sheetEl);
-
-    const targetWidth=Math.max(720,Number(widthEl?.value||1080));
+    const targetWidth=Math.max(720,Number($('#width')?.value||1080));
     const scale=targetWidth/Math.max(1,sheetEl.offsetWidth);
 
     const canvas=await html2canvas(sheetEl,{
@@ -859,28 +1042,7 @@ async function save(){
     toast('PNG로 저장했어요.');
   }catch(e){
     console.error('PNG save failed',e);
-
-    // Blob 다운로드가 막힌 브라우저를 위한 한 번 더 저장 경로
-    try{
-      const targetWidth=Math.max(720,Number(widthEl?.value||1080));
-      const scale=targetWidth/Math.max(1,sheetEl.offsetWidth);
-      const fallbackCanvas=await html2canvas(sheetEl,{
-        scale,
-        useCORS:true,
-        backgroundColor:null,
-        logging:false
-      });
-      const a=document.createElement('a');
-      a.href=fallbackCanvas.toDataURL('image/png');
-      a.download=safePngName();
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      toast('PNG로 저장했어요.');
-    }catch(fallbackError){
-      console.error('PNG fallback failed',fallbackError);
-      toast('PNG 저장에 실패했어요. 다시 한 번 눌러 주세요.');
-    }
+    toast('PNG 저장에 실패했어요.');
   }finally{
     document.body.classList.remove('exporting');
     sheetEl.style.transform=oldTransform;
@@ -890,6 +1052,7 @@ async function save(){
       pngBtn.disabled=false;
       pngBtn.textContent=oldButtonText;
     }
+
     setTimeout(fitPreview,0);
   }
 }
@@ -919,7 +1082,12 @@ $('#answerMeters').addEventListener('click',e=>{
   renderAnswerEditor();updateMeterPreview(i);saveResponses();
 });
 $('#share').onclick=createShareLink;
-['pair','relation','nameA','nameB','quoteA','quoteB','world'].forEach(id=>$('#'+id).addEventListener('input',sync));['bgc','cardc','accentc','textc','radius','border','shadow','decor','pairSize','bodySize','quoteSize','questionSize','line','pad','gap','shape','font','showRelation','showWorld','showMeters','showFooter','patternOpacity','patternSize'].forEach(id=>$('#'+id).addEventListener('input',apply));$('.themes').addEventListener('click',e=>{const b=e.target.closest('.theme');if(b)theme(b.dataset.theme)});$('.patterns').addEventListener('click',e=>{const b=e.target.closest('.patternBtn');if(b)selectPattern(b.dataset.pattern)});fileA.onchange=e=>photo(e.target.files[0],'A');fileB.onchange=e=>photo(e.target.files[0],'B');['zoomA','xA','yA'].forEach(id=>$('#'+id).addEventListener('input',()=>trans('A')));['zoomB','xB','yB'].forEach(id=>$('#'+id).addEventListener('input',()=>trans('B')));fontFile.onchange=e=>fontLoad(e.target.files[0]);qedit.addEventListener('input',e=>{if(e.target.dataset.q!==undefined){const i=+e.target.dataset.q;qs[i]=e.target.value;const q=$(`[data-preview-q="${i}"] .q`);if(q)q.textContent=e.target.value}});qedit.addEventListener('click',e=>{if(e.target.dataset.delq!==undefined){if(qs.length<=1)return toast('질문은 한 개 이상 필요해요.');qs.splice(+e.target.dataset.delq,1);renderQ()}});medit.addEventListener('input',e=>{if(e.target.dataset.m!==undefined){const i=+e.target.dataset.m;meters[i]=e.target.value;const m=$(`[data-preview-m="${i}"] strong`);if(m)m.textContent=e.target.value}});medit.addEventListener('click',e=>{if(e.target.dataset.delm!==undefined){if(meters.length<=1)return toast('항목은 한 개 이상 필요해요.');meters.splice(+e.target.dataset.delm,1);renderM()}});addQ.onclick=()=>{qs.push('새 질문');renderQ()};addM.onclick=()=>{meters.push('새 항목');renderM()};$('#png').onclick=save;fit.onclick=fitPreview;reset.onclick=()=>{if(confirm('입력한 내용과 꾸미기 설정을 초기화할까요?'))location.reload()};addEventListener('resize',fitPreview);renderQ();renderM();sync();theme('milk');selectPattern('none');apply();
+['pair','relation','nameA','nameB','quoteA','quoteB','world'].forEach(id=>$('#'+id).addEventListener('input',sync));['bgc','cardc','accentc','textc','radius','border','shadow','decor','pairSize','bodySize','quoteSize','questionSize','line','pad','gap','shape','font','showRelation','showWorld','showMeters','showFooter','patternOpacity','patternSize'].forEach(id=>$('#'+id).addEventListener('input',apply));$('.themes').addEventListener('click',e=>{const b=e.target.closest('.theme');if(b)theme(b.dataset.theme)});$('.patterns').addEventListener('click',e=>{const b=e.target.closest('.patternBtn');if(b)selectPattern(b.dataset.pattern)});fileA.onchange=e=>photo(e.target.files[0],'A');fileB.onchange=e=>photo(e.target.files[0],'B');['zoomA','xA','yA'].forEach(id=>$('#'+id).addEventListener('input',()=>trans('A')));['zoomB','xB','yB'].forEach(id=>$('#'+id).addEventListener('input',()=>trans('B')));fontFile.onchange=e=>fontLoad(e.target.files[0]);qedit.addEventListener('input',e=>{if(e.target.dataset.q!==undefined){const i=+e.target.dataset.q;qs[i]=e.target.value;const q=$(`[data-preview-q="${i}"] .q`);if(q)q.textContent=e.target.value}});qedit.addEventListener('click',e=>{if(e.target.dataset.delq!==undefined){if(qs.length<=1)return toast('질문은 한 개 이상 필요해요.');qs.splice(+e.target.dataset.delq,1);renderQ()}});medit.addEventListener('input',e=>{if(e.target.dataset.m!==undefined){const i=+e.target.dataset.m;meters[i]=e.target.value;const m=$(`[data-preview-m="${i}"] strong`);if(m)m.textContent=e.target.value}});medit.addEventListener('click',e=>{if(e.target.dataset.delm!==undefined){if(meters.length<=1)return toast('항목은 한 개 이상 필요해요.');meters.splice(+e.target.dataset.delm,1);renderM()}});addQ.onclick=()=>{qs.push('새 질문');renderQ()};addM.onclick=()=>{meters.push('새 항목');renderM()};$('#png').onclick=save;
+$('#closePngPreview').onclick=()=>$('#pngPreviewDialog').close();
+$('#downloadPreparedPng').onclick=()=>{
+  if(!directPreparedDownload())toast('PNG가 아직 준비되지 않았어요.');
+};
+$('#sharePreparedPng').onclick=sharePreparedPng;fit.onclick=fitPreview;reset.onclick=()=>{if(confirm('입력한 내용과 꾸미기 설정을 초기화할까요?'))location.reload()};addEventListener('resize',fitPreview);renderQ();renderM();sync();theme('milk');selectPattern('none');apply();
 setTimeout(()=>{
   if(typeof firebase==='undefined'||!fbAuth||!fbDb){
     setShareState('Firebase 연결을 불러오지 못했어요. 새로고침 후 다시 시도해 주세요.','error');
