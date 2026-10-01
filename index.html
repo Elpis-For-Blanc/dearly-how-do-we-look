@@ -31,6 +31,49 @@ button,input,textarea,select{font:inherit}button{cursor:pointer}.top{position:st
 body.respondMode .bar span:after{content:" · 트친 작성 중";color:var(--u)}
 @media(max-width:600px){.answerMeter{grid-template-columns:1fr}.rating{justify-content:flex-start}.heartRate{width:36px;height:36px}}
 
+
+.linkDialog{
+  width:min(620px,calc(100vw - 28px));
+  border:0;border-radius:18px;padding:0;
+  box-shadow:0 24px 80px rgba(61,38,49,.26);
+}
+.linkDialog::backdrop{background:rgba(43,31,37,.38);backdrop-filter:blur(4px)}
+.linkDialogCard{padding:18px;background:#fff}
+.linkDialogHead{display:flex;justify-content:space-between;gap:15px;align-items:flex-start;margin-bottom:16px}
+.linkDialogHead strong{font-size:16px}
+.linkDialogHead p{margin:5px 0 0;color:var(--muted);font-size:12px;line-height:1.55}
+.copyRow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
+.copyRow input{font-size:11px}
+.privacyNote{margin:5px 0 0;color:var(--muted);font-size:11px;line-height:1.5}
+
+.submitPanel{text-align:center}
+.submitResponseBtn{width:100%;padding:13px}
+#submitState{margin:9px 0 0}
+.responseList{display:grid;gap:9px;margin-top:13px}
+.responseEmpty{
+  padding:24px 12px;text-align:center;border:1px dashed var(--line);
+  border-radius:12px;color:var(--muted);font-size:12px
+}
+.responseCard{
+  width:100%;display:grid;gap:4px;text-align:left;
+  border:1px solid var(--line);border-radius:12px;background:#fff;padding:11px 12px;color:var(--text)
+}
+.responseCard:hover{border-color:#d98bab;background:#fff8fb}
+.responseCard.active{border-color:#d86c9d;background:#fff2f7;box-shadow:0 0 0 2px rgba(216,108,157,.08)}
+.responseCard strong{font-size:13px}
+.responseCard span{font-size:10px;color:var(--muted)}
+.responseCard small{font-size:11px;color:#75616b}
+.ownerSelectionPanel{position:sticky;bottom:10px}
+.ownerDenied{padding:26px 14px;text-align:center}
+.ownerDenied strong{display:block;margin-bottom:7px}
+.ownerDenied p{margin:0;color:var(--muted);font-size:12px;line-height:1.6}
+body.ownerMode .bar span:after{content:" · 주인 전용";color:var(--u)}
+
+@media(max-width:600px){
+  .copyRow{grid-template-columns:1fr}
+  .copyRow .btn{width:100%}
+}
+
 </style>
 </head>
 <body>
@@ -47,16 +90,93 @@ body.respondMode .bar span:after{content:" · 트친 작성 중";color:var(--u)}
 <section class="panel"><div class="ph"><h2>표시 설정</h2></div><div class="toggles"><label><input id="showRelation" type="checkbox" checked> 관계 한 줄</label><label><input id="showWorld" type="checkbox" checked> 세계관/장르</label><label><input id="showMeters" type="checkbox" checked> 분위기 체감</label><label><input id="showFooter" type="checkbox" checked> 하단 안내</label></div><label style="margin-top:11px">전체 여백<input id="pad" type="range" min="22" max="70" value="42"></label><label>PNG 너비<select id="width"><option value="1080">1080 px</option><option value="1440">1440 px</option><option value="2160">2160 px</option></select></label></section>
 </aside>
 
+
 <aside id="answerEditor" class="editor answerEditor" hidden>
-<section class="panel answerIntro"><div class="ph"><h2>이 페어, 어떻게 보여?</h2><small>트친 작성용</small></div><p class="answerHelp">보이는 인상대로 자유롭게 적어주세요. 전부 채우지 않아도 괜찮아요 ♡</p></section>
-<section class="panel"><div class="ph"><h2>트친이 보는 우리 둘</h2><small>쓰고 싶은 항목만 작성해 주세요.</small></div><div id="answerQuestions" class="answerQuestions"></div></section>
-<section class="panel"><div class="ph"><h2>이 페어의 분위기는?</h2><small>하트를 눌러주세요.</small></div><div id="answerMeters" class="answerMeters"></div></section>
-<section class="panel"><p class="answerHelp">작성한 답변은 이 브라우저에만 임시 저장됩니다. 다 적은 뒤 위의 <b>PNG 저장</b>을 눌러 결과를 저장해 주세요.</p></section>
+  <section class="panel answerIntro">
+    <div class="ph"><h2>이 페어, 어떻게 보여?</h2><small>트친 작성용</small></div>
+    <p class="answerHelp">보이는 인상대로 자유롭게 적어주세요. 전부 채우지 않아도 괜찮아요 ♡</p>
+  </section>
+
+  <section class="panel">
+    <div class="ph"><h2>보내는 이름</h2><small>닉네임 또는 익명</small></div>
+    <label>표시 방식
+      <select id="identityMode">
+        <option value="nickname">닉네임 표시</option>
+        <option value="anonymous">익명으로 보내기</option>
+      </select>
+    </label>
+    <label id="nicknameWrap">닉네임
+      <input id="responderNickname" type="text" maxlength="24" placeholder="트위터 닉네임 등">
+    </label>
+    <p class="answerHelp">익명을 선택하면 주인에게는 이름 대신 <b>익명</b>으로 표시됩니다.</p>
+  </section>
+
+  <section class="panel">
+    <div class="ph"><h2>트친이 보는 우리 둘</h2><small>쓰고 싶은 항목만 작성해 주세요.</small></div>
+    <div id="answerQuestions" class="answerQuestions"></div>
+  </section>
+
+  <section class="panel">
+    <div class="ph"><h2>이 페어의 분위기는?</h2><small>하트를 눌러주세요.</small></div>
+    <div id="answerMeters" class="answerMeters"></div>
+  </section>
+
+  <section class="panel submitPanel">
+    <button id="submitResponse" type="button" class="btn primary submitResponseBtn">주인에게 보내기</button>
+    <p id="submitState" class="answerHelp">작성 중인 내용은 이 브라우저에 임시 저장됩니다.</p>
+  </section>
+</aside>
+
+
+
+<aside id="ownerEditor" class="editor ownerEditor" hidden>
+  <section class="panel">
+    <div class="ph">
+      <h2>받은 답변</h2>
+      <button id="refreshResponses" type="button" class="btn small">새로고침</button>
+    </div>
+    <p class="answerHelp">이 목록은 틀을 만든 주인만 볼 수 있습니다. 답변을 눌러 미리보기에서 확인하고 PNG로 저장할 수 있어요.</p>
+    <div id="responseList" class="responseList"></div>
+  </section>
+
+  <section class="panel ownerSelectionPanel">
+    <div class="ph"><h2>선택한 답변</h2><small id="selectedResponseName">아직 선택하지 않았어요.</small></div>
+    <p id="selectedResponseMeta" class="answerHelp">왼쪽 목록에서 답변을 선택해 주세요.</p>
+  </section>
 </aside>
 
 <section class="previewWrap"><div class="bar"><span>미리보기</span><button id="fit" class="btn small">화면에 맞추기</button></div><div class="stage"><article id="sheet" class="sheet"><div id="patternLayer" class="patternLayer"></div><div class="decor da">♡</div><div class="decor db">♡</div><header class="pairTop"><span class="pairMini">OUR PAIR</span><h2 id="pPair">PAIR NAME</h2><p id="pRelation">관계 한 줄</p></header><section class="hero"><div class="charBlock"><div id="boxA" class="photo round"><img id="imgA"><span class="placeholder">PHOTO A</span></div><strong id="pNameA" class="charName">캐릭터 A</strong><p id="pQuoteA" class="quote">캐릭터 A의 한 줄 대사</p></div><div class="middle"><b>♡</b></div><div class="charBlock"><div id="boxB" class="photo round"><img id="imgB"><span class="placeholder">PHOTO B</span></div><strong id="pNameB" class="charName">캐릭터 B</strong><p id="pQuoteB" class="quote">캐릭터 B의 한 줄 대사</p></div></section><section id="worldRow" class="infoCard"><div class="infoLine"><span class="tag">W</span><strong id="pWorld">세계관 / 장르</strong></div></section><section id="metersSec" class="metersSec"><div class="sect"><span>♡</span> 이 페어의 분위기는?</div><div id="meters" class="meters"></div></section><section class="qs"><div class="sect"><span>♡</span> 트친이 보는 우리 둘</div><div id="qgrid" class="qgrid"></div></section><footer id="footer" class="foot">전부 채우지 않아도 괜찮아요. 쓰고 싶은 항목만 자유롭게 작성해주세요 ♡</footer></article></div></section>
 </main>
 <div id="toast" class="toast"></div>
+
+<dialog id="linkDialog" class="linkDialog">
+  <form method="dialog" class="linkDialogCard">
+    <div class="linkDialogHead">
+      <div>
+        <strong>링크가 만들어졌어요 ♡</strong>
+        <p>트친에게는 트친용 링크만 공유하고, 주인용 링크는 본인만 보관해 주세요.</p>
+      </div>
+      <button class="x" value="cancel" aria-label="닫기">×</button>
+    </div>
+
+    <label>트친용 링크
+      <div class="copyRow">
+        <input id="friendLinkOutput" type="text" readonly>
+        <button id="copyFriendLink" type="button" class="btn small primary">복사</button>
+      </div>
+    </label>
+
+    <label>주인용 링크
+      <div class="copyRow">
+        <input id="ownerLinkOutput" type="text" readonly>
+        <button id="copyOwnerLink" type="button" class="btn small">복사</button>
+      </div>
+    </label>
+
+    <p class="privacyNote">주인용 링크의 답변 목록은 이 틀을 만든 계정에서만 열 수 있습니다.</p>
+  </form>
+</dialog>
+
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
@@ -80,8 +200,11 @@ try{
   fbAuth=firebase.auth();
   fbDb=firebase.firestore();
 }catch(e){console.error("Firebase init failed",e)}
-let respondMode=false,sharedSheetId="";
+let respondMode=false,ownerMode=false,sharedSheetId="";
 let answers=[],meterRatings=[];
+let currentSheetOwnerUid="";
+let currentOwnerResponses=[];
+let selectedOwnerResponseId="";
 
 let qs=['이 페어의 첫인상은?','지금은 어떻게 보여?','한 단어로 표현한다면?','가장 먼저 떠오르는 색은?','가장 어울리는 계절은?','둘의 관계에서 제일 좋아하는 부분','가장 기억에 남는 설정이나 장면','먼저 좋아했을 것 같은 쪽','질투가 더 많아 보이는 쪽','상대를 더 많이 봐주는 쪽','어울리는 노래 한 곡','이 둘은 결국 ______할 것 같다','이 페어의 최고 매력 포인트','한 줄 평'];
 let meters=['달달함','애틋함','안정감','긴장감','집착','개그','서사맛'];
@@ -170,10 +293,43 @@ async function buildTemplate(){
     questions:[...qs],meters:[...meters]
   };
 }
-async function ensureAnonymous(){
+async function waitForAuthState(){
   if(!fbAuth)throw new Error('auth unavailable');
   if(fbAuth.currentUser)return fbAuth.currentUser;
-  const result=await fbAuth.signInAnonymously();return result.user;
+  const existing=await new Promise(resolve=>{
+    let settled=false;
+    const off=fbAuth.onAuthStateChanged(user=>{
+      if(settled)return;
+      settled=true;off();resolve(user||null);
+    });
+    setTimeout(()=>{
+      if(settled)return;
+      settled=true;off();resolve(fbAuth.currentUser||null);
+    },1200);
+  });
+  return existing;
+}
+async function ensureAnonymous(){
+  const existing=await waitForAuthState();
+  if(existing)return existing;
+  const result=await fbAuth.signInAnonymously();
+  return result.user;
+}
+async function copyText(value,msg){
+  try{
+    await navigator.clipboard.writeText(value);
+    toast(msg);
+  }catch(e){
+    prompt('아래 링크를 복사해 주세요.',value);
+  }
+}
+function rememberOwnedSheet(id,pairName){
+  try{
+    const key='dearly-pair-owned-sheets';
+    const list=JSON.parse(localStorage.getItem(key)||'[]').filter(x=>x?.id!==id);
+    list.unshift({id,pairName:pairName||'PAIR',createdAt:Date.now()});
+    localStorage.setItem(key,JSON.stringify(list.slice(0,30)));
+  }catch(e){console.error(e)}
 }
 async function createShareLink(){
   if(!fbDb)return toast('공유 링크 연결을 불러오지 못했어요.');
@@ -181,14 +337,34 @@ async function createShareLink(){
   try{
     const user=await ensureAnonymous(),template=await buildTemplate();
     if(new Blob([JSON.stringify(template)]).size>850000)throw new Error('template-too-large');
-    const ref=await fbDb.collection('pairSheets').add({ownerUid:user.uid,createdAt:firebase.firestore.FieldValue.serverTimestamp(),template});
-    const u=new URL(location.href);u.search='';u.hash='';u.searchParams.set('sheet',ref.id);
-    try{await navigator.clipboard.writeText(u.toString());toast('트친용 링크를 복사했어요 ♡')}
-    catch(e){prompt('아래 링크를 복사해 주세요.',u.toString())}
+
+    const ref=await fbDb.collection('pairSheets').add({
+      ownerUid:user.uid,
+      createdAt:firebase.firestore.FieldValue.serverTimestamp(),
+      template
+    });
+
+    rememberOwnedSheet(ref.id,template.basic?.pair||'');
+
+    const friendUrl=new URL(location.href);
+    friendUrl.search='';friendUrl.hash='';
+    friendUrl.searchParams.set('sheet',ref.id);
+
+    const ownerUrl=new URL(location.href);
+    ownerUrl.search='';ownerUrl.hash='';
+    ownerUrl.searchParams.set('owner',ref.id);
+
+    $('#friendLinkOutput').value=friendUrl.toString();
+    $('#ownerLinkOutput').value=ownerUrl.toString();
+    $('#linkDialog').showModal();
   }catch(e){
     console.error(e);
-    toast(String(e?.message||'').includes('template-too-large')?'사진 용량이 너무 커요. 더 작은 사진으로 바꿔주세요.':'링크를 만들지 못했어요. Firestore 설정을 확인해 주세요.');
-  }finally{b.classList.remove('shareLoading');b.textContent=old}
+    toast(String(e?.message||'').includes('template-too-large')
+      ?'사진 용량이 너무 커요. 더 작은 사진으로 바꿔주세요.'
+      :'링크를 만들지 못했어요. Firestore 설정을 확인해 주세요.');
+  }finally{
+    b.classList.remove('shareLoading');b.textContent=old;
+  }
 }
 function setField(id,v,isCheck=false){const e=$('#'+id);if(!e)return;if(isCheck)e.checked=!!v;else if(v!==undefined&&v!==null)e.value=String(v)}
 function setSharedImage(w,src){if(!src)return;const img=$('#img'+w),box=$('#box'+w);img.src=src;box.classList.add('has');trans(w)}
@@ -205,12 +381,25 @@ function applySharedTemplate(t){
 function responseStorageKey(){return sharedSheetId?`dearly-pair-response:${sharedSheetId}`:''}
 function loadSavedResponses(){
   try{
-    const raw=localStorage.getItem(responseStorageKey());if(!raw)return;const s=JSON.parse(raw);
+    const raw=localStorage.getItem(responseStorageKey());if(!raw)return;
+    const s=JSON.parse(raw);
     if(Array.isArray(s.answers))answers=qs.map((_,i)=>s.answers[i]||'');
     if(Array.isArray(s.ratings))meterRatings=meters.map((_,i)=>Number(s.ratings[i]||0));
+    if(s.identityMode)setField('identityMode',s.identityMode);
+    if(typeof s.nickname==='string')setField('responderNickname',s.nickname);
   }catch(e){console.error(e)}
 }
-function saveResponses(){try{if(responseStorageKey())localStorage.setItem(responseStorageKey(),JSON.stringify({answers,ratings:meterRatings}))}catch(e){}}
+function saveResponses(){
+  try{
+    if(!responseStorageKey())return;
+    localStorage.setItem(responseStorageKey(),JSON.stringify({
+      answers,
+      ratings:meterRatings,
+      identityMode:val('identityMode')||'nickname',
+      nickname:val('responderNickname')
+    }));
+  }catch(e){}
+}
 function renderAnswerEditor(){
   const aq=$('#answerQuestions');aq.innerHTML='';
   qs.forEach((q,i)=>{const d=document.createElement('div');d.className='answerField';d.innerHTML=`<label>${esc(q)}<textarea rows="${isWide(i)?4:3}" data-answer="${i}" placeholder="자유롭게 적어주세요.">${esc(answers[i]||'')}</textarea></label>`;aq.appendChild(d)});
@@ -219,24 +408,231 @@ function renderAnswerEditor(){
 }
 function updateAnswerPreview(i){const b=$(`[data-preview-q="${i}"]`);if(!b)return;const a=answers[i]||'';b.innerHTML=`<div class="q">${esc(qs[i]||'')}</div>${a?`<div class="answerText">${esc(a)}</div>`:`<div class="lines"><i></i><i></i>${isWide(i)?'<i></i>':''}</div>`}`}
 function updateMeterPreview(i){const d=$(`[data-preview-m="${i}"]`);if(!d)return;const r=Number(meterRatings[i]||0);d.innerHTML=`<strong>${esc(meters[i]||'')}</strong><div class="hearts">${[1,2,3,4,5].map(n=>n<=r?'♥':'♡').join(' ')}</div>`}
-function enterRespondMode(){
-  respondMode=true;document.body.classList.add('respondMode');$('#creatorEditor').hidden=true;$('#answerEditor').hidden=false;$('#share').hidden=true;
-  $('#reset').textContent='답변 초기화';$('#siteGuide').textContent='트친이 공유한 페어틀이에요. 아래에서 자유롭게 답하고 결과를 PNG로 저장해 주세요 ♡';
-  loadSavedResponses();renderQ();renderM();renderAnswerEditor();
-  $('#reset').onclick=()=>{if(!confirm('작성한 답변을 모두 지울까요?'))return;answers=new Array(qs.length).fill('');meterRatings=new Array(meters.length).fill(0);localStorage.removeItem(responseStorageKey());renderQ();renderM();renderAnswerEditor();toast('답변을 초기화했어요.')};
+
+function applyIdentityUi(){
+  const anon=val('identityMode')==='anonymous';
+  $('#nicknameWrap').hidden=anon;
+  $('#responderNickname').disabled=anon;
+  saveResponses();
 }
-async function loadSharedSheet(){
-  const id=new URL(location.href).searchParams.get('sheet');if(!id)return false;sharedSheetId=id;
-  if(!fbDb){toast('공유된 페어틀을 불러오지 못했어요.');return false}
+async function submitResponseToOwner(){
+  if(!sharedSheetId||!fbDb)return toast('공유된 틀 정보를 찾지 못했어요.');
+  const mode=val('identityMode')==='anonymous'?'anonymous':'nickname';
+  const nickname=val('responderNickname').trim();
+
+  if(mode==='nickname'&&!nickname){
+    toast('표시할 닉네임을 입력해 주세요.');
+    $('#responderNickname').focus();
+    return;
+  }
+
+  const hasAnyAnswer=answers.some(v=>String(v).trim())||meterRatings.some(v=>Number(v)>0);
+  if(!hasAnyAnswer){
+    toast('답변을 한 개 이상 작성해 주세요.');
+    return;
+  }
+
+  const btn=$('#submitResponse'),old=btn.textContent;
+  btn.disabled=true;btn.textContent='보내는 중…';
+
   try{
-    const snap=await fbDb.collection('pairSheets').doc(id).get();if(!snap.exists)throw new Error('not-found');
-    applySharedTemplate(snap.data().template||{});enterRespondMode();return true;
-  }catch(e){console.error(e);toast('공유된 페어틀을 찾지 못했어요.');return false}
+    const user=await ensureAnonymous();
+    await fbDb.collection('pairSheets').doc(sharedSheetId)
+      .collection('responses').doc(user.uid).set({
+        responderUid:user.uid,
+        anonymous:mode==='anonymous',
+        displayName:mode==='anonymous'?'':nickname.slice(0,24),
+        answers:answers.map(v=>String(v||'').slice(0,1000)),
+        ratings:meterRatings.map(v=>Math.max(0,Math.min(5,Number(v||0)))),
+        submittedAt:firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt:firebase.firestore.FieldValue.serverTimestamp()
+      },{merge:true});
+
+    $('#submitState').textContent='주인에게 보냈어요 ♡ 다시 보내면 기존 답변이 최신 내용으로 바뀝니다.';
+    toast('주인에게 답변을 보냈어요 ♡');
+  }catch(e){
+    console.error(e);
+    toast('답변을 보내지 못했어요. 잠시 뒤 다시 시도해 주세요.');
+  }finally{
+    btn.disabled=false;btn.textContent=old;
+  }
+}
+
+function enterRespondMode(){
+  respondMode=true;ownerMode=false;
+  document.body.classList.add('respondMode');
+  document.body.classList.remove('ownerMode');
+  $('#creatorEditor').hidden=true;
+  $('#ownerEditor').hidden=true;
+  $('#answerEditor').hidden=false;
+  $('#share').hidden=true;
+  $('#reset').textContent='답변 초기화';
+  $('#siteGuide').textContent='트친이 공유한 페어틀이에요. 닉네임 또는 익명으로 답변을 보내고, 결과를 PNG로 저장할 수 있어요 ♡';
+
+  loadSavedResponses();
+  applyIdentityUi();
+  renderQ();renderM();renderAnswerEditor();
+
+  $('#reset').onclick=()=>{
+    if(!confirm('작성한 답변을 모두 지울까요?'))return;
+    answers=new Array(qs.length).fill('');
+    meterRatings=new Array(meters.length).fill(0);
+    localStorage.removeItem(responseStorageKey());
+    setField('identityMode','nickname');
+    setField('responderNickname','');
+    applyIdentityUi();
+    renderQ();renderM();renderAnswerEditor();
+    $('#submitState').textContent='작성 중인 내용은 이 브라우저에 임시 저장됩니다.';
+    toast('답변을 초기화했어요.');
+  };
+}
+function formatResponseTime(ts){
+  try{
+    const d=ts?.toDate?ts.toDate():null;
+    if(!d)return '방금 전';
+    return d.toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  }catch(e){return ''}
+}
+function responseDisplayName(r){
+  return r?.anonymous?'익명':(String(r?.displayName||'').trim()||'닉네임 없음');
+}
+function responseAnswerCount(r){
+  const a=Array.isArray(r?.answers)?r.answers.filter(v=>String(v||'').trim()).length:0;
+  const m=Array.isArray(r?.ratings)?r.ratings.filter(v=>Number(v)>0).length:0;
+  return a+m;
+}
+function renderOwnerResponseList(){
+  const list=$('#responseList');list.innerHTML='';
+  if(!currentOwnerResponses.length){
+    list.innerHTML='<div class="responseEmpty">아직 도착한 답변이 없어요 ♡</div>';
+    return;
+  }
+  currentOwnerResponses.forEach(r=>{
+    const b=document.createElement('button');
+    b.type='button';
+    b.className='responseCard'+(r.id===selectedOwnerResponseId?' active':'');
+    b.dataset.responseId=r.id;
+    b.innerHTML=`<strong>${esc(responseDisplayName(r))}</strong><span>${esc(formatResponseTime(r.submittedAt||r.updatedAt))}</span><small>작성 ${responseAnswerCount(r)}개</small>`;
+    list.appendChild(b);
+  });
+}
+function showOwnerResponse(r){
+  if(!r)return;
+  selectedOwnerResponseId=r.id;
+  answers=qs.map((_,i)=>String(r.answers?.[i]||''));
+  meterRatings=meters.map((_,i)=>Math.max(0,Math.min(5,Number(r.ratings?.[i]||0))));
+  renderQ();renderM();
+  $('#selectedResponseName').textContent=responseDisplayName(r);
+  $('#selectedResponseMeta').textContent=`${formatResponseTime(r.submittedAt||r.updatedAt)} · 작성 ${responseAnswerCount(r)}개`;
+  renderOwnerResponseList();
+}
+async function loadOwnerResponses(){
+  const list=$('#responseList');
+  list.innerHTML='<div class="responseEmpty">답변을 불러오는 중…</div>';
+  try{
+    const snap=await fbDb.collection('pairSheets').doc(sharedSheetId).collection('responses').get();
+    currentOwnerResponses=snap.docs.map(d=>({id:d.id,...d.data()}))
+      .sort((a,b)=>{
+        const at=a.submittedAt?.toMillis?.()||a.updatedAt?.toMillis?.()||0;
+        const bt=b.submittedAt?.toMillis?.()||b.updatedAt?.toMillis?.()||0;
+        return bt-at;
+      });
+    renderOwnerResponseList();
+    if(selectedOwnerResponseId){
+      const selected=currentOwnerResponses.find(r=>r.id===selectedOwnerResponseId);
+      if(selected)showOwnerResponse(selected);
+    }
+  }catch(e){
+    console.error(e);
+    list.innerHTML='<div class="responseEmpty">답변을 불러오지 못했어요.</div>';
+    toast('받은 답변을 불러오지 못했어요.');
+  }
+}
+function showOwnerDenied(){
+  ownerMode=true;respondMode=false;
+  document.body.classList.add('ownerMode');
+  document.body.classList.remove('respondMode');
+  $('#creatorEditor').hidden=true;
+  $('#answerEditor').hidden=true;
+  $('#ownerEditor').hidden=false;
+  $('#share').hidden=true;
+  $('#png').hidden=true;
+  $('#reset').hidden=true;
+  $('#responseList').innerHTML='<div class="ownerDenied"><strong>주인 전용 링크예요.</strong><p>이 틀을 만든 브라우저에서만 받은 답변을 볼 수 있습니다.</p></div>';
+  $('#selectedResponseName').textContent='접근할 수 없어요.';
+  $('#selectedResponseMeta').textContent='주인 계정이 확인되지 않았습니다.';
+  $('#siteGuide').textContent='이 페이지는 틀을 만든 주인만 볼 수 있는 답변함입니다.';
+}
+async function enterOwnerMode(sheetData){
+  ownerMode=true;respondMode=false;
+  document.body.classList.add('ownerMode');
+  document.body.classList.remove('respondMode');
+  $('#creatorEditor').hidden=true;
+  $('#answerEditor').hidden=true;
+  $('#ownerEditor').hidden=false;
+  $('#share').hidden=true;
+  $('#png').hidden=false;
+  $('#reset').hidden=true;
+  $('#siteGuide').textContent='주인 전용 답변함이에요. 트친들이 보낸 답변은 이 페이지에서만 확인할 수 있어요 ♡';
+
+  const user=await ensureAnonymous();
+  if(!user||user.uid!==sheetData.ownerUid){
+    showOwnerDenied();
+    return false;
+  }
+
+  currentSheetOwnerUid=sheetData.ownerUid;
+  await loadOwnerResponses();
+  return true;
+}
+async function loadEntryMode(){
+  const url=new URL(location.href);
+  const ownerId=url.searchParams.get('owner');
+  const friendId=url.searchParams.get('sheet');
+  const id=ownerId||friendId;
+  if(!id)return false;
+
+  sharedSheetId=id;
+  if(!fbDb){toast('공유된 페어틀을 불러오지 못했어요.');return false}
+
+  try{
+    const snap=await fbDb.collection('pairSheets').doc(id).get();
+    if(!snap.exists)throw new Error('not-found');
+    const data=snap.data();
+    currentSheetOwnerUid=data.ownerUid||'';
+    applySharedTemplate(data.template||{});
+
+    if(ownerId){
+      await enterOwnerMode(data);
+    }else{
+      enterRespondMode();
+    }
+    return true;
+  }catch(e){
+    console.error(e);
+    toast('공유된 페어틀을 찾지 못했어요.');
+    return false;
+  }
 }
 
 function fitPreview(){if(innerWidth>600){sheet.style.transform='';sheet.style.marginBottom='';return}const scale=Math.min(1,($('.stage').clientWidth-4)/860);sheet.style.transform=`scale(${scale})`;sheet.style.marginBottom=-(sheet.offsetHeight*(1-scale))+'px'}
 async function save(){if(typeof html2canvas!=='function')return toast('PNG 저장 모듈을 불러오지 못했어요.');const old=sheet.style.transform,oldm=sheet.style.marginBottom;sheet.style.transform='none';sheet.style.marginBottom='0';try{await document.fonts.ready;const scale=Number(width.value)/sheet.offsetWidth;const c=await html2canvas(sheet,{scale,useCORS:true,backgroundColor:null,logging:false});const a=document.createElement('a');a.download=((pair.value||'pair').replace(/[\\/:*?"<>|]/g,'_'))+'-우리페어어떻게보여.png';a.href=c.toDataURL('image/png');a.click();toast('PNG로 저장했어요.')}catch(e){console.error(e);toast('PNG 저장에 실패했어요.')}finally{sheet.style.transform=old;sheet.style.marginBottom=oldm}}
 
+
+identityMode.addEventListener('change',()=>{applyIdentityUi();saveResponses()});
+responderNickname.addEventListener('input',saveResponses);
+submitResponse.onclick=submitResponseToOwner;
+
+responseList.addEventListener('click',e=>{
+  const b=e.target.closest('[data-response-id]');
+  if(!b)return;
+  const r=currentOwnerResponses.find(x=>x.id===b.dataset.responseId);
+  if(r)showOwnerResponse(r);
+});
+refreshResponses.onclick=loadOwnerResponses;
+
+copyFriendLink.onclick=()=>copyText(friendLinkOutput.value,'트친용 링크를 복사했어요 ♡');
+copyOwnerLink.onclick=()=>copyText(ownerLinkOutput.value,'주인용 링크를 복사했어요 ♡');
 answerQuestions.addEventListener('input',e=>{
   if(e.target.dataset.answer===undefined)return;
   const i=Number(e.target.dataset.answer);answers[i]=e.target.value;updateAnswerPreview(i);saveResponses();
@@ -247,6 +643,6 @@ answerMeters.addEventListener('click',e=>{
   renderAnswerEditor();updateMeterPreview(i);saveResponses();
 });
 share.onclick=createShareLink;
-['pair','relation','nameA','nameB','quoteA','quoteB','world'].forEach(id=>$('#'+id).addEventListener('input',sync));['bgc','cardc','accentc','textc','radius','border','shadow','decor','pairSize','bodySize','quoteSize','questionSize','line','pad','gap','shape','font','showRelation','showWorld','showMeters','showFooter','patternOpacity','patternSize'].forEach(id=>$('#'+id).addEventListener('input',apply));$('.themes').addEventListener('click',e=>{const b=e.target.closest('.theme');if(b)theme(b.dataset.theme)});$('.patterns').addEventListener('click',e=>{const b=e.target.closest('.patternBtn');if(b)selectPattern(b.dataset.pattern)});fileA.onchange=e=>photo(e.target.files[0],'A');fileB.onchange=e=>photo(e.target.files[0],'B');['zoomA','xA','yA'].forEach(id=>$('#'+id).addEventListener('input',()=>trans('A')));['zoomB','xB','yB'].forEach(id=>$('#'+id).addEventListener('input',()=>trans('B')));fontFile.onchange=e=>fontLoad(e.target.files[0]);qedit.addEventListener('input',e=>{if(e.target.dataset.q!==undefined){const i=+e.target.dataset.q;qs[i]=e.target.value;const q=$(`[data-preview-q="${i}"] .q`);if(q)q.textContent=e.target.value}});qedit.addEventListener('click',e=>{if(e.target.dataset.delq!==undefined){if(qs.length<=1)return toast('질문은 한 개 이상 필요해요.');qs.splice(+e.target.dataset.delq,1);renderQ()}});medit.addEventListener('input',e=>{if(e.target.dataset.m!==undefined){const i=+e.target.dataset.m;meters[i]=e.target.value;const m=$(`[data-preview-m="${i}"] strong`);if(m)m.textContent=e.target.value}});medit.addEventListener('click',e=>{if(e.target.dataset.delm!==undefined){if(meters.length<=1)return toast('항목은 한 개 이상 필요해요.');meters.splice(+e.target.dataset.delm,1);renderM()}});addQ.onclick=()=>{qs.push('새 질문');renderQ()};addM.onclick=()=>{meters.push('새 항목');renderM()};png.onclick=save;fit.onclick=fitPreview;reset.onclick=()=>{if(confirm('입력한 내용과 꾸미기 설정을 초기화할까요?'))location.reload()};addEventListener('resize',fitPreview);renderQ();renderM();sync();theme('milk');selectPattern('none');apply();loadSharedSheet().finally(()=>setTimeout(fitPreview,50));
+['pair','relation','nameA','nameB','quoteA','quoteB','world'].forEach(id=>$('#'+id).addEventListener('input',sync));['bgc','cardc','accentc','textc','radius','border','shadow','decor','pairSize','bodySize','quoteSize','questionSize','line','pad','gap','shape','font','showRelation','showWorld','showMeters','showFooter','patternOpacity','patternSize'].forEach(id=>$('#'+id).addEventListener('input',apply));$('.themes').addEventListener('click',e=>{const b=e.target.closest('.theme');if(b)theme(b.dataset.theme)});$('.patterns').addEventListener('click',e=>{const b=e.target.closest('.patternBtn');if(b)selectPattern(b.dataset.pattern)});fileA.onchange=e=>photo(e.target.files[0],'A');fileB.onchange=e=>photo(e.target.files[0],'B');['zoomA','xA','yA'].forEach(id=>$('#'+id).addEventListener('input',()=>trans('A')));['zoomB','xB','yB'].forEach(id=>$('#'+id).addEventListener('input',()=>trans('B')));fontFile.onchange=e=>fontLoad(e.target.files[0]);qedit.addEventListener('input',e=>{if(e.target.dataset.q!==undefined){const i=+e.target.dataset.q;qs[i]=e.target.value;const q=$(`[data-preview-q="${i}"] .q`);if(q)q.textContent=e.target.value}});qedit.addEventListener('click',e=>{if(e.target.dataset.delq!==undefined){if(qs.length<=1)return toast('질문은 한 개 이상 필요해요.');qs.splice(+e.target.dataset.delq,1);renderQ()}});medit.addEventListener('input',e=>{if(e.target.dataset.m!==undefined){const i=+e.target.dataset.m;meters[i]=e.target.value;const m=$(`[data-preview-m="${i}"] strong`);if(m)m.textContent=e.target.value}});medit.addEventListener('click',e=>{if(e.target.dataset.delm!==undefined){if(meters.length<=1)return toast('항목은 한 개 이상 필요해요.');meters.splice(+e.target.dataset.delm,1);renderM()}});addQ.onclick=()=>{qs.push('새 질문');renderQ()};addM.onclick=()=>{meters.push('새 항목');renderM()};png.onclick=save;fit.onclick=fitPreview;reset.onclick=()=>{if(confirm('입력한 내용과 꾸미기 설정을 초기화할까요?'))location.reload()};addEventListener('resize',fitPreview);renderQ();renderM();sync();theme('milk');selectPattern('none');apply();loadEntryMode().finally(()=>setTimeout(fitPreview,50));
 </script>
 </body></html>
