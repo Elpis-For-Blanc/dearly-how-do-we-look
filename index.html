@@ -79,6 +79,10 @@ body.ownerMode .bar span:after{content:" · 주인 전용";color:var(--u)}
 .shareState.error{color:#b84f72}
 .shareState.ok{color:#5f8a68}
 
+
+body.exporting #sheet{transform:none!important}
+body.exporting .previewStage{overflow:visible!important}
+
 </style>
 </head>
 <body>
@@ -694,6 +698,7 @@ async function enterOwnerMode(sheetData){
   $('#ownerEditor').hidden=false;
   $('#share').hidden=true;
   $('#png').hidden=false;
+  $('#png').disabled=false;
   $('#reset').hidden=true;
   $('#siteGuide').textContent='주인 전용 답변함이에요. 트친들이 보낸 답변은 이 페이지에서만 확인할 수 있어요 ♡';
 
@@ -738,7 +743,156 @@ async function loadEntryMode(){
 }
 
 function fitPreview(){if(innerWidth>600){sheet.style.transform='';sheet.style.marginBottom='';return}const scale=Math.min(1,($('.stage').clientWidth-4)/860);sheet.style.transform=`scale(${scale})`;sheet.style.marginBottom=-(sheet.offsetHeight*(1-scale))+'px'}
-async function save(){if(typeof html2canvas!=='function')return toast('PNG 저장 모듈을 불러오지 못했어요.');const old=sheet.style.transform,oldm=sheet.style.marginBottom;sheet.style.transform='none';sheet.style.marginBottom='0';try{await document.fonts.ready;const scale=Number(width.value)/sheet.offsetWidth;const c=await html2canvas(sheet,{scale,useCORS:true,backgroundColor:null,logging:false});const a=document.createElement('a');a.download=((pair.value||'pair').replace(/[\\/:*?"<>|]/g,'_'))+'-우리페어어떻게보여.png';a.href=c.toDataURL('image/png');a.click();toast('PNG로 저장했어요.')}catch(e){console.error(e);toast('PNG 저장에 실패했어요.')}finally{sheet.style.transform=old;sheet.style.marginBottom=oldm}}
+async function canvasToBlob(canvas){
+  return await new Promise((resolve,reject)=>{
+    try{
+      canvas.toBlob(blob=>{
+        if(blob)resolve(blob);
+        else reject(new Error('blob-create-failed'));
+      },'image/png');
+    }catch(e){
+      reject(e);
+    }
+  });
+}
+
+async function waitForSheetAssets(root){
+  try{
+    await Promise.race([
+      document.fonts?.ready || Promise.resolve(),
+      new Promise(resolve=>setTimeout(resolve,1800))
+    ]);
+  }catch(e){}
+
+  const images=[...root.querySelectorAll('img')].filter(img=>img.src);
+  await Promise.all(images.map(async img=>{
+    try{
+      if(img.complete&&img.naturalWidth)return;
+      if(img.decode){
+        await Promise.race([
+          img.decode(),
+          new Promise(resolve=>setTimeout(resolve,1500))
+        ]);
+      }
+    }catch(e){}
+  }));
+}
+
+function safePngName(){
+  const pairEl=$('#pair');
+  const base=(pairEl?.value||'pair').trim()||'pair';
+  return base.replace(/[\\/:*?"<>|]/g,'_')+'-우리페어어떻게보여.png';
+}
+
+async function triggerPngDownload(blob,filename){
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=filename;
+  a.rel='noopener';
+  a.style.display='none';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+
+  // 모바일 브라우저에서 다운로드가 시작되기 전에 URL이 사라지지 않도록 유지
+  setTimeout(()=>URL.revokeObjectURL(url),20000);
+}
+
+async function save(){
+  if(typeof html2canvas!=='function'){
+    toast('PNG 저장 모듈을 불러오지 못했어요.');
+    return;
+  }
+
+  const sheetEl=$('#sheet');
+  const widthEl=$('#width');
+  const pngBtn=$('#png');
+
+  if(!sheetEl){
+    toast('저장할 틀을 찾지 못했어요.');
+    return;
+  }
+
+  // 주인 답변함에서는 선택된 답변이 있어야 저장
+  if(ownerMode&&!selectedOwnerResponseId){
+    if(currentOwnerResponses.length){
+      showOwnerResponse(currentOwnerResponses[0]);
+    }else{
+      toast('저장할 답변이 아직 없어요.');
+      return;
+    }
+  }
+
+  const oldTransform=sheetEl.style.transform;
+  const oldMargin=sheetEl.style.marginBottom;
+  const oldButtonText=pngBtn?.textContent||'PNG 저장';
+
+  if(pngBtn){
+    pngBtn.disabled=true;
+    pngBtn.textContent='PNG 만드는 중…';
+  }
+
+  sheetEl.style.transform='none';
+  sheetEl.style.marginBottom='0';
+  document.body.classList.add('exporting');
+
+  try{
+    await waitForSheetAssets(sheetEl);
+
+    const targetWidth=Math.max(720,Number(widthEl?.value||1080));
+    const scale=targetWidth/Math.max(1,sheetEl.offsetWidth);
+
+    const canvas=await html2canvas(sheetEl,{
+      scale,
+      useCORS:true,
+      allowTaint:false,
+      backgroundColor:null,
+      logging:false,
+      imageTimeout:5000,
+      scrollX:0,
+      scrollY:-window.scrollY
+    });
+
+    const blob=await canvasToBlob(canvas);
+    await triggerPngDownload(blob,safePngName());
+    toast('PNG로 저장했어요.');
+  }catch(e){
+    console.error('PNG save failed',e);
+
+    // Blob 다운로드가 막힌 브라우저를 위한 한 번 더 저장 경로
+    try{
+      const targetWidth=Math.max(720,Number(widthEl?.value||1080));
+      const scale=targetWidth/Math.max(1,sheetEl.offsetWidth);
+      const fallbackCanvas=await html2canvas(sheetEl,{
+        scale,
+        useCORS:true,
+        backgroundColor:null,
+        logging:false
+      });
+      const a=document.createElement('a');
+      a.href=fallbackCanvas.toDataURL('image/png');
+      a.download=safePngName();
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      toast('PNG로 저장했어요.');
+    }catch(fallbackError){
+      console.error('PNG fallback failed',fallbackError);
+      toast('PNG 저장에 실패했어요. 다시 한 번 눌러 주세요.');
+    }
+  }finally{
+    document.body.classList.remove('exporting');
+    sheetEl.style.transform=oldTransform;
+    sheetEl.style.marginBottom=oldMargin;
+
+    if(pngBtn){
+      pngBtn.disabled=false;
+      pngBtn.textContent=oldButtonText;
+    }
+    setTimeout(fitPreview,0);
+  }
+}
 
 
 $('#identityMode').addEventListener('change',()=>{applyIdentityUi();saveResponses()});
@@ -765,7 +919,7 @@ $('#answerMeters').addEventListener('click',e=>{
   renderAnswerEditor();updateMeterPreview(i);saveResponses();
 });
 $('#share').onclick=createShareLink;
-['pair','relation','nameA','nameB','quoteA','quoteB','world'].forEach(id=>$('#'+id).addEventListener('input',sync));['bgc','cardc','accentc','textc','radius','border','shadow','decor','pairSize','bodySize','quoteSize','questionSize','line','pad','gap','shape','font','showRelation','showWorld','showMeters','showFooter','patternOpacity','patternSize'].forEach(id=>$('#'+id).addEventListener('input',apply));$('.themes').addEventListener('click',e=>{const b=e.target.closest('.theme');if(b)theme(b.dataset.theme)});$('.patterns').addEventListener('click',e=>{const b=e.target.closest('.patternBtn');if(b)selectPattern(b.dataset.pattern)});fileA.onchange=e=>photo(e.target.files[0],'A');fileB.onchange=e=>photo(e.target.files[0],'B');['zoomA','xA','yA'].forEach(id=>$('#'+id).addEventListener('input',()=>trans('A')));['zoomB','xB','yB'].forEach(id=>$('#'+id).addEventListener('input',()=>trans('B')));fontFile.onchange=e=>fontLoad(e.target.files[0]);qedit.addEventListener('input',e=>{if(e.target.dataset.q!==undefined){const i=+e.target.dataset.q;qs[i]=e.target.value;const q=$(`[data-preview-q="${i}"] .q`);if(q)q.textContent=e.target.value}});qedit.addEventListener('click',e=>{if(e.target.dataset.delq!==undefined){if(qs.length<=1)return toast('질문은 한 개 이상 필요해요.');qs.splice(+e.target.dataset.delq,1);renderQ()}});medit.addEventListener('input',e=>{if(e.target.dataset.m!==undefined){const i=+e.target.dataset.m;meters[i]=e.target.value;const m=$(`[data-preview-m="${i}"] strong`);if(m)m.textContent=e.target.value}});medit.addEventListener('click',e=>{if(e.target.dataset.delm!==undefined){if(meters.length<=1)return toast('항목은 한 개 이상 필요해요.');meters.splice(+e.target.dataset.delm,1);renderM()}});addQ.onclick=()=>{qs.push('새 질문');renderQ()};addM.onclick=()=>{meters.push('새 항목');renderM()};png.onclick=save;fit.onclick=fitPreview;reset.onclick=()=>{if(confirm('입력한 내용과 꾸미기 설정을 초기화할까요?'))location.reload()};addEventListener('resize',fitPreview);renderQ();renderM();sync();theme('milk');selectPattern('none');apply();
+['pair','relation','nameA','nameB','quoteA','quoteB','world'].forEach(id=>$('#'+id).addEventListener('input',sync));['bgc','cardc','accentc','textc','radius','border','shadow','decor','pairSize','bodySize','quoteSize','questionSize','line','pad','gap','shape','font','showRelation','showWorld','showMeters','showFooter','patternOpacity','patternSize'].forEach(id=>$('#'+id).addEventListener('input',apply));$('.themes').addEventListener('click',e=>{const b=e.target.closest('.theme');if(b)theme(b.dataset.theme)});$('.patterns').addEventListener('click',e=>{const b=e.target.closest('.patternBtn');if(b)selectPattern(b.dataset.pattern)});fileA.onchange=e=>photo(e.target.files[0],'A');fileB.onchange=e=>photo(e.target.files[0],'B');['zoomA','xA','yA'].forEach(id=>$('#'+id).addEventListener('input',()=>trans('A')));['zoomB','xB','yB'].forEach(id=>$('#'+id).addEventListener('input',()=>trans('B')));fontFile.onchange=e=>fontLoad(e.target.files[0]);qedit.addEventListener('input',e=>{if(e.target.dataset.q!==undefined){const i=+e.target.dataset.q;qs[i]=e.target.value;const q=$(`[data-preview-q="${i}"] .q`);if(q)q.textContent=e.target.value}});qedit.addEventListener('click',e=>{if(e.target.dataset.delq!==undefined){if(qs.length<=1)return toast('질문은 한 개 이상 필요해요.');qs.splice(+e.target.dataset.delq,1);renderQ()}});medit.addEventListener('input',e=>{if(e.target.dataset.m!==undefined){const i=+e.target.dataset.m;meters[i]=e.target.value;const m=$(`[data-preview-m="${i}"] strong`);if(m)m.textContent=e.target.value}});medit.addEventListener('click',e=>{if(e.target.dataset.delm!==undefined){if(meters.length<=1)return toast('항목은 한 개 이상 필요해요.');meters.splice(+e.target.dataset.delm,1);renderM()}});addQ.onclick=()=>{qs.push('새 질문');renderQ()};addM.onclick=()=>{meters.push('새 항목');renderM()};$('#png').onclick=save;fit.onclick=fitPreview;reset.onclick=()=>{if(confirm('입력한 내용과 꾸미기 설정을 초기화할까요?'))location.reload()};addEventListener('resize',fitPreview);renderQ();renderM();sync();theme('milk');selectPattern('none');apply();
 setTimeout(()=>{
   if(typeof firebase==='undefined'||!fbAuth||!fbDb){
     setShareState('Firebase 연결을 불러오지 못했어요. 새로고침 후 다시 시도해 주세요.','error');
