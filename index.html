@@ -10,16 +10,33 @@
 *{box-sizing:border-box}
 :root{--u:#d86c9d;--line:#eadfe5;--muted:#8e7a84;--bg:#f7dce8;--card:#fffafd;--accent:#d86c9d;--text:#573f49;--radius:24px;--border:1px;--pairSize:38px;--body:17px;--question:15px;--quote:14px;--lh:1.55;--pad:42px;--photoGap:18px;--shadow:0 16px 42px rgba(91,49,68,.13);--font:"Pretendard","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;--patternOpacity:.18;--patternSize:26px}
 html,body{margin:0;min-height:100%;background:#f6f3f5;color:#392f34;font-family:"Pretendard","Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif}
-button,input,textarea,select{font:inherit}button{cursor:pointer}.top{position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;gap:18px;align-items:center;padding:16px 22px;background:#fffffff0;backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}.top h1{margin:0;font-size:21px}.top p{margin:4px 0 0;color:var(--muted);font-size:12px}.actions{display:flex;gap:8px}.btn{border:1px solid var(--line);border-radius:11px;padding:9px 13px;background:#fff;font-weight:800}.btn.primary{background:var(--u);border-color:var(--u);color:#fff}.layout{display:grid;grid-template-columns:minmax(340px,445px) minmax(0,1fr);min-height:calc(100vh - 75px)}.editor{padding:14px;max-height:calc(100vh - 75px);overflow:auto}.panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:15px;margin-bottom:11px;box-shadow:0 4px 18px rgba(60,40,50,.04)}.ph{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}.ph h2{margin:0;font-size:14px}.ph small,.hint{font-size:11px;color:var(--muted)}label{display:grid;gap:6px;margin-bottom:10px;font-size:12px;font-weight:800;color:#66555d}input[type=text],textarea,select{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px;background:#fff;color:#332b2f;outline:none}textarea{resize:vertical;line-height:1.5}input:focus,textarea:focus,select:focus{border-color:#d98bab;box-shadow:0 0 0 3px #fdebf3}input[type=color]{width:100%;height:38px;border:1px solid var(--line);border-radius:10px;background:#fff;padding:4px}input[type=range]{width:100%}.two{display:grid;grid-template-columns:1fr 1fr;gap:9px}.themes,.patterns{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:11px}.theme,.patternBtn{display:flex;align-items:center;gap:8px;justify-content:flex-start;border:1px solid var(--line);border-radius:10px;padding:8px 9px;background:#fff;font-size:11px;font-weight:800}.theme.active,.patternBtn.active{border-color:#d98bab;background:#fff7fa}.swatch{width:18px;height:18px;border-radius:6px;border:1px solid #00000012;flex:0 0 auto}.patternSwatch{width:22px;height:22px;border-radius:6px;border:1px solid #00000012;background-color:#f9e6ee;flex:0 0 auto}.ps-none{background:#f9e6ee}.ps-heart{background-color:#f9e6ee;background-image:radial-gradient(circle,#d86c9d 1.4px,transparent 1.7px);background-size:8px 8px}.ps-dot{background-color:#f9e6ee;background-image:radial-gradient(circle,#d86c9d 1px,transparent 1.3px);background-size:6px 6px}.ps-check{background-color:#f9e6ee;background-image:linear-gradient(90deg,#d86c9d22 50%,transparent 50%),linear-gradient(#d86c9d22 50%,transparent 50%);background-size:8px 8px}.ps-stripe{background:repeating-linear-gradient(135deg,#f9e6ee 0 4px,#d86c9d22 4px 6px)}.ps-star{background-color:#f9e6ee;background-image:radial-gradient(circle,#d86c9d 1px,transparent 1.5px);background-size:10px 10px}.ps-lace{background:radial-gradient(circle at 50% 100%,transparent 5px,#d86c9d22 5.5px 7px,transparent 7.5px) 0 0/14px 10px,#f9e6ee}.photoCtl{display:grid;grid-template-columns:1fr 1fr;gap:8px}.photoCtl>div{border:1px solid var(--line);border-radius:12px;padding:10px;background:#fdfbfc}.photoCtl strong{display:block;font-size:12px;margin-bottom:7px}.photoCtl label{font-size:10px;margin-top:7px}.toggles{display:grid;grid-template-columns:1fr 1fr;gap:8px}.toggles label{display:flex;gap:6px;align-items:center;margin:0;font-weight:700}.qedit{display:grid;gap:6px}.qrow{display:grid;grid-template-columns:24px 1fr 34px;gap:6px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:6px;background:#fdfbfc}.qrow span{color:#b39ca7;text-align:center}.qrow input{padding:8px}.x{border:0;background:#fff0f5;color:#bb557c;border-radius:9px;height:34px;font-size:18px}.small{padding:7px 10px;font-size:11px}.wide{width:100%;margin-top:8px}.previewWrap{min-width:0;display:flex;flex-direction:column}.bar{height:46px;padding:0 15px;display:flex;align-items:center;justify-content:space-between;background:#fbf9fa;border-bottom:1px solid var(--line);color:var(--muted);font-size:12px;font-weight:800}.stage{flex:1;overflow:auto;padding:28px;background:#f3eff2}
+button,input,textarea,select{font:inherit}button{cursor:pointer}.top{position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;gap:18px;align-items:center;padding:16px 22px;background:#fffffff0;backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}.top h1{margin:0;font-size:21px}.top p{margin:4px 0 0;color:var(--muted);font-size:12px}.actions{display:flex;gap:8px}.btn{border:1px solid var(--line);border-radius:11px;padding:9px 13px;background:#fff;font-weight:800}.btn.primary{background:var(--u);border-color:var(--u);color:#fff}.layout{display:grid;grid-template-columns:minmax(340px,445px) minmax(0,1fr);min-height:calc(100vh - 75px)}.editor{padding:14px;max-height:calc(100vh - 75px);overflow:auto}.panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:15px;margin-bottom:11px;box-shadow:0 4px 18px rgba(60,40,50,.04)}.ph{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px}.ph h2{margin:0;font-size:14px}.ph small,.hint{font-size:11px;color:var(--muted)}label{display:grid;gap:6px;margin-bottom:10px;font-size:12px;font-weight:800;color:#66555d}input[type=text],textarea,select{width:100%;border:1px solid var(--line);border-radius:10px;padding:10px;background:#fff;color:#332b2f;outline:none}textarea{resize:vertical;line-height:1.5}input:focus,textarea:focus,select:focus{border-color:#d98bab;box-shadow:0 0 0 3px #fdebf3}input[type=color]{width:100%;height:38px;border:1px solid var(--line);border-radius:10px;background:#fff;padding:4px}input[type=range]{width:100%}.two{display:grid;grid-template-columns:1fr 1fr;gap:9px}.themes,.patterns{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:11px}.theme,.patternBtn{display:flex;align-items:center;gap:8px;justify-content:flex-start;border:1px solid var(--line);border-radius:10px;padding:8px 9px;background:#fff;font-size:11px;font-weight:800}.theme.active,.patternBtn.active{border-color:#d98bab;background:#fff7fa}.swatch{width:18px;height:18px;border-radius:6px;border:1px solid #00000012;flex:0 0 auto}.patternSwatch{width:22px;height:22px;border-radius:6px;border:1px solid #00000012;background-color:#f9e6ee;flex:0 0 auto}.ps-none{background:#f9e6ee}.ps-heart{background-color:#f9e6ee;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28'%3E%3Cpath d='M14 23.5C12.8 22.2 5.2 17.6 5.2 10.9C5.2 7.4 7.8 5.2 10.5 5.2C12.2 5.2 13.5 6.1 14 7.1C14.5 6.1 15.8 5.2 17.5 5.2C20.2 5.2 22.8 7.4 22.8 10.9C22.8 17.6 15.2 22.2 14 23.5Z' fill='none' stroke='%23d86c9d' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-size:19px 19px;background-position:center;background-repeat:no-repeat}.ps-dot{background-color:#f9e6ee;background-image:radial-gradient(circle,#d86c9d 1px,transparent 1.3px);background-size:6px 6px}.ps-check{background-color:#f9e6ee;background-image:linear-gradient(90deg,#d86c9d22 50%,transparent 50%),linear-gradient(#d86c9d22 50%,transparent 50%);background-size:8px 8px}.ps-stripe{background:repeating-linear-gradient(135deg,#f9e6ee 0 4px,#d86c9d22 4px 6px)}.ps-star{background-color:#f9e6ee;background-image:radial-gradient(circle,#d86c9d 1px,transparent 1.5px);background-size:10px 10px}.ps-lace{background:radial-gradient(circle at 50% 100%,transparent 5px,#d86c9d22 5.5px 7px,transparent 7.5px) 0 0/14px 10px,#f9e6ee}.photoCtl{display:grid;grid-template-columns:1fr 1fr;gap:8px}.photoCtl>div{border:1px solid var(--line);border-radius:12px;padding:10px;background:#fdfbfc}.photoCtl strong{display:block;font-size:12px;margin-bottom:7px}.photoCtl label{font-size:10px;margin-top:7px}.toggles{display:grid;grid-template-columns:1fr 1fr;gap:8px}.toggles label{display:flex;gap:6px;align-items:center;margin:0;font-weight:700}.qedit{display:grid;gap:6px}.qrow{display:grid;grid-template-columns:24px 1fr 34px;gap:6px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:6px;background:#fdfbfc}.qrow span{color:#b39ca7;text-align:center}.qrow input{padding:8px}.x{border:0;background:#fff0f5;color:#bb557c;border-radius:9px;height:34px;font-size:18px}.small{padding:7px 10px;font-size:11px}.wide{width:100%;margin-top:8px}.previewWrap{min-width:0;display:flex;flex-direction:column}.bar{height:46px;padding:0 15px;display:flex;align-items:center;justify-content:space-between;background:#fbf9fa;border-bottom:1px solid var(--line);color:var(--muted);font-size:12px;font-weight:800}.stage{flex:1;overflow:auto;padding:28px;background:#f3eff2}
 .sheet{position:relative;isolation:isolate;width:860px;margin:0 auto;padding:var(--pad);background-color:var(--bg);color:var(--text);font-family:var(--font);font-size:var(--body);line-height:var(--lh);border-radius:calc(var(--radius) + 8px);box-shadow:var(--shadow);overflow:hidden}.sheet:before{content:"";position:absolute;inset:14px;border:var(--border) solid color-mix(in srgb,var(--accent) 32%,transparent);border-radius:var(--radius);pointer-events:none;z-index:-1}.patternLayer{position:absolute;inset:0;z-index:-2;pointer-events:none;opacity:var(--patternOpacity);background-size:var(--patternSize) var(--patternSize)}.decor{position:absolute;color:color-mix(in srgb,var(--accent) 70%,white);font-size:30px;font-weight:900;opacity:.7}.da{top:20px;left:26px}.db{right:26px;bottom:20px}.pairTop{text-align:center;margin:2px 0 22px}.pairTop .pairMini{display:block;font-size:9px;font-weight:900;letter-spacing:.26em;color:var(--accent);margin-bottom:5px}.pairTop h2{margin:0;font-size:var(--pairSize);line-height:1.15;letter-spacing:-.035em}.pairTop p{margin:7px 0 0;font-size:.78em;color:color-mix(in srgb,var(--text) 68%,white)}.hero{display:grid;grid-template-columns:1fr 110px 1fr;gap:var(--photoGap);align-items:start;margin-bottom:15px}.charBlock{text-align:center;min-width:0}.photo{position:relative;aspect-ratio:1;overflow:hidden;background:color-mix(in srgb,var(--card) 82%,var(--bg));border:var(--border) solid color-mix(in srgb,var(--accent) 27%,transparent);box-shadow:0 8px 18px #0000000d}.photo.round{border-radius:var(--radius)}.photo.circle{border-radius:50%}.photo.square{border-radius:4px}.photo.heart{clip-path:polygon(50% 92%,12% 55%,6% 32%,14% 14%,30% 7%,43% 12%,50% 23%,57% 12%,70% 7%,86% 14%,94% 32%,88% 55%);border-radius:0}.photo img{width:100%;height:100%;object-fit:cover;display:none;transform-origin:center}.photo.has img{display:block}.placeholder{position:absolute;inset:0;display:grid;place-items:center;font-size:11px;font-weight:900;letter-spacing:.15em;color:color-mix(in srgb,var(--accent) 42%,white)}.photo.has .placeholder{display:none}.charName{display:block;margin-top:9px;font-size:.92em;font-weight:900}.quote{margin:5px 0 0;padding:8px 10px;min-height:44px;border-radius:calc(var(--radius)*.5);background:color-mix(in srgb,var(--card) 75%,transparent);border:1px solid color-mix(in srgb,var(--accent) 17%,transparent);font-size:var(--quote);line-height:1.45;color:color-mix(in srgb,var(--text) 82%,white);word-break:keep-all;overflow-wrap:anywhere}.quote:before{content:'“';color:var(--accent);font-weight:900}.quote:after{content:'”';color:var(--accent);font-weight:900}.middle{display:flex;min-height:230px;align-items:center;justify-content:center}.middle b{display:block;color:var(--accent);font-size:28px;line-height:1}.infoCard,.metersSec,.qs{background:var(--card);border:var(--border) solid color-mix(in srgb,var(--accent) 22%,transparent);border-radius:var(--radius);box-shadow:0 8px 20px #0000000b}.infoCard{padding:13px 16px;margin-bottom:13px}.infoLine{display:flex;align-items:center;gap:8px}.tag{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:color-mix(in srgb,var(--accent) 14%,white);color:var(--accent);font-size:9px;font-weight:900;flex:0 0 auto}.infoLine strong{font-size:.82em}.metersSec,.qs{padding:17px;margin-bottom:13px}.sect{display:flex;gap:6px;align-items:center;margin-bottom:12px;font-weight:900;font-size:.9em}.sect span{color:var(--accent)}.meters{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px}.meter{display:grid;grid-template-columns:72px 1fr;gap:8px;align-items:center}.meter strong{font-size:.72em}.hearts{color:var(--accent);letter-spacing:.06em}.qgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.qbox{min-height:84px;padding:11px 12px;border-radius:calc(var(--radius)*.62);background:color-mix(in srgb,var(--bg) 22%,white);border:1px dashed color-mix(in srgb,var(--accent) 25%,transparent)}.qbox.wide{grid-column:1/-1;min-height:102px}.q{font-size:var(--question);font-weight:900;line-height:1.4}.lines{display:grid;gap:8px;margin-top:11px}.lines i{border-bottom:1px solid color-mix(in srgb,var(--text) 15%,transparent);height:1px}.foot{text-align:center;font-size:.72em;color:color-mix(in srgb,var(--text) 60%,white)}.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,16px);opacity:0;transition:.2s;background:#30272b;color:#fff;border-radius:999px;padding:9px 13px;font-size:12px;font-weight:800;pointer-events:none;z-index:99}.toast.show{opacity:1;transform:translate(-50%,0)}
 @media(max-width:980px){.layout{grid-template-columns:1fr}.editor{max-height:none}.previewWrap{min-height:760px}}
 @media(max-width:600px){.top{padding:12px 13px;align-items:flex-start}.top p{display:block;font-size:10px;line-height:1.45}.top h1{font-size:18px}.actions{flex-direction:column}.editor{padding:9px}.two,.photoCtl{grid-template-columns:1fr}.stage{padding:10px}.sheet{transform-origin:top left}}
+
+.answerHelp{margin:0;color:var(--muted);font-size:12px;line-height:1.65}
+.answerQuestions{display:grid;gap:11px}
+.answerField{display:grid;gap:6px}
+.answerField label{margin:0;font-size:12px;color:#66555d}
+.answerField textarea{min-height:76px}
+.answerMeters{display:grid;gap:12px}
+.answerMeter{display:grid;grid-template-columns:minmax(82px,1fr) auto;gap:12px;align-items:center}
+.answerMeter strong{font-size:12px}
+.rating{display:flex;gap:3px}
+.heartRate{width:32px;height:32px;border:1px solid #eadfe5;border-radius:9px;background:#fff;color:#d86c9d;font-size:19px;line-height:1}
+.heartRate.on{background:#fff0f6;border-color:#d98bab;color:#c85083}
+.answerText{margin-top:10px;font-size:.83em;line-height:1.55;white-space:pre-wrap;word-break:keep-all;overflow-wrap:anywhere;color:color-mix(in srgb,var(--text) 88%,white)}
+.shareLoading{opacity:.65;pointer-events:none}
+body.respondMode .bar span:after{content:" · 트친 작성 중";color:var(--u)}
+@media(max-width:600px){.answerMeter{grid-template-columns:1fr}.rating{justify-content:flex-start}.heartRate{width:36px;height:36px}}
+
 </style>
 </head>
 <body>
-<header class="top"><div><h1>우리 페어, 어떻게 보여?</h1><p>사진과 기본 정보만 채워 올리고, 나머지는 트친들이 자유롭게 작성하는 페어 인상틀입니다 ♡</p></div><div class="actions"><button id="reset" class="btn">초기화</button><button id="png" class="btn primary">PNG 저장</button></div></header>
+<header class="top"><div><h1>우리 페어, 어떻게 보여?</h1><p id="siteGuide">사진과 기본 정보만 채워 올리고, 나머지는 트친들이 자유롭게 작성하는 페어 인상틀입니다 ♡</p></div><div class="actions"><button id="reset" class="btn">초기화</button><button id="share" class="btn">트친용 링크 만들기</button><button id="png" class="btn primary">PNG 저장</button></div></header>
 <main class="layout">
-<aside class="editor">
+<aside id="creatorEditor" class="editor">
 <section class="panel"><div class="ph"><h2>페어 정보</h2><small>완성되는 틀에 표시됩니다.</small></div><label>페어명<input id="pair" type="text" placeholder="예: BLANC × ELPIS"></label><label>관계 한 줄<input id="relation" type="text" placeholder="예: 서로의 유일한 페어"></label><div class="two"><label>캐릭터 A 이름<input id="nameA" type="text" placeholder="캐릭터 A"></label><label>캐릭터 B 이름<input id="nameB" type="text" placeholder="캐릭터 B"></label></div><div class="two"><label>캐릭터 A 한 줄 대사<input id="quoteA" type="text" maxlength="80" placeholder="캐릭터다운 한마디"></label><label>캐릭터 B 한 줄 대사<input id="quoteB" type="text" maxlength="80" placeholder="캐릭터다운 한마디"></label></div><label>세계관 / 장르<input id="world" type="text" placeholder="예: 현대 판타지 · 센티넬버스"></label></section>
 <section class="panel"><div class="ph"><h2>사진</h2><small>확대와 위치를 조절할 수 있습니다.</small></div><div class="photoCtl"><div><strong>캐릭터 A</strong><input id="fileA" type="file" accept="image/*"><label>확대<input id="zoomA" type="range" min="1" max="2.2" step=".01" value="1"></label><label>가로 위치<input id="xA" type="range" min="0" max="100" value="50"></label><label>세로 위치<input id="yA" type="range" min="0" max="100" value="50"></label></div><div><strong>캐릭터 B</strong><input id="fileB" type="file" accept="image/*"><label>확대<input id="zoomB" type="range" min="1" max="2.2" step=".01" value="1"></label><label>가로 위치<input id="xB" type="range" min="0" max="100" value="50"></label><label>세로 위치<input id="yB" type="range" min="0" max="100" value="50"></label></div></div><div class="two" style="margin-top:10px"><label>사진 모양<select id="shape"><option value="round">둥근 사각형</option><option value="circle">원형</option><option value="heart">하트</option><option value="square">각진 사각형</option></select></label><label>사진 간격<input id="gap" type="range" min="8" max="40" value="18"></label></div></section>
 <section class="panel"><div class="ph"><h2>디자인 테마</h2><small>테마를 고른 뒤 색을 따로 바꿀 수도 있습니다.</small></div><div class="themes"><button class="theme active" data-theme="milk"><i class="swatch" style="background:#f7dce8"></i>딸기우유</button><button class="theme" data-theme="berry"><i class="swatch" style="background:#f1d3df"></i>베리핑크</button><button class="theme" data-theme="rose"><i class="swatch" style="background:#f3e7e2"></i>로즈 아이보리</button><button class="theme" data-theme="peach"><i class="swatch" style="background:#fae3d6"></i>피치</button><button class="theme" data-theme="lav"><i class="swatch" style="background:#e8e0f6"></i>라벤더</button><button class="theme" data-theme="sky"><i class="swatch" style="background:#deedf9"></i>스카이</button><button class="theme" data-theme="mint"><i class="swatch" style="background:#dff1ea"></i>민트</button><button class="theme" data-theme="cream"><i class="swatch" style="background:#f5ecd6"></i>크림</button><button class="theme" data-theme="vintage"><i class="swatch" style="background:#eadfce"></i>빈티지</button><button class="theme" data-theme="navy"><i class="swatch" style="background:#d9e0ee"></i>네이비 로망</button><button class="theme" data-theme="blackpink"><i class="swatch" style="background:#2f2930"></i>블랙핑크</button><button class="theme" data-theme="mono"><i class="swatch" style="background:#e9e9e9"></i>모노</button></div><div class="two"><label>배경색<input id="bgc" type="color" value="#f7dce8"></label><label>카드색<input id="cardc" type="color" value="#fffafd"></label><label>포인트색<input id="accentc" type="color" value="#d86c9d"></label><label>글자색<input id="textc" type="color" value="#573f49"></label></div><div class="two"><label>모서리<input id="radius" type="range" min="0" max="36" value="24"></label><label>테두리<input id="border" type="range" min="0" max="4" value="1"></label></div><div class="two"><label>그림자<select id="shadow"><option value="soft">은은하게</option><option value="mid">보통</option><option value="strong">진하게</option><option value="none">없음</option></select></label><label>장식<select id="decor"><option value="heart">하트</option><option value="star">별</option><option value="ribbon">리본</option><option value="flower">꽃</option><option value="sparkle">반짝이</option><option value="none">없음</option></select></label></div></section>
@@ -29,12 +46,43 @@ button,input,textarea,select{font:inherit}button{cursor:pointer}.top{position:st
 <section class="panel"><div class="ph"><h2>분위기 체감</h2><small>하트 5칸으로 표시됩니다.</small></div><div id="medit" class="qedit"></div><button id="addM" class="btn small wide">+ 분위기 항목 추가</button></section>
 <section class="panel"><div class="ph"><h2>표시 설정</h2></div><div class="toggles"><label><input id="showRelation" type="checkbox" checked> 관계 한 줄</label><label><input id="showWorld" type="checkbox" checked> 세계관/장르</label><label><input id="showMeters" type="checkbox" checked> 분위기 체감</label><label><input id="showFooter" type="checkbox" checked> 하단 안내</label></div><label style="margin-top:11px">전체 여백<input id="pad" type="range" min="22" max="70" value="42"></label><label>PNG 너비<select id="width"><option value="1080">1080 px</option><option value="1440">1440 px</option><option value="2160">2160 px</option></select></label></section>
 </aside>
+
+<aside id="answerEditor" class="editor answerEditor" hidden>
+<section class="panel answerIntro"><div class="ph"><h2>이 페어, 어떻게 보여?</h2><small>트친 작성용</small></div><p class="answerHelp">보이는 인상대로 자유롭게 적어주세요. 전부 채우지 않아도 괜찮아요 ♡</p></section>
+<section class="panel"><div class="ph"><h2>트친이 보는 우리 둘</h2><small>쓰고 싶은 항목만 작성해 주세요.</small></div><div id="answerQuestions" class="answerQuestions"></div></section>
+<section class="panel"><div class="ph"><h2>이 페어의 분위기는?</h2><small>하트를 눌러주세요.</small></div><div id="answerMeters" class="answerMeters"></div></section>
+<section class="panel"><p class="answerHelp">작성한 답변은 이 브라우저에만 임시 저장됩니다. 다 적은 뒤 위의 <b>PNG 저장</b>을 눌러 결과를 저장해 주세요.</p></section>
+</aside>
+
 <section class="previewWrap"><div class="bar"><span>미리보기</span><button id="fit" class="btn small">화면에 맞추기</button></div><div class="stage"><article id="sheet" class="sheet"><div id="patternLayer" class="patternLayer"></div><div class="decor da">♡</div><div class="decor db">♡</div><header class="pairTop"><span class="pairMini">OUR PAIR</span><h2 id="pPair">PAIR NAME</h2><p id="pRelation">관계 한 줄</p></header><section class="hero"><div class="charBlock"><div id="boxA" class="photo round"><img id="imgA"><span class="placeholder">PHOTO A</span></div><strong id="pNameA" class="charName">캐릭터 A</strong><p id="pQuoteA" class="quote">캐릭터 A의 한 줄 대사</p></div><div class="middle"><b>♡</b></div><div class="charBlock"><div id="boxB" class="photo round"><img id="imgB"><span class="placeholder">PHOTO B</span></div><strong id="pNameB" class="charName">캐릭터 B</strong><p id="pQuoteB" class="quote">캐릭터 B의 한 줄 대사</p></div></section><section id="worldRow" class="infoCard"><div class="infoLine"><span class="tag">W</span><strong id="pWorld">세계관 / 장르</strong></div></section><section id="metersSec" class="metersSec"><div class="sect"><span>♡</span> 이 페어의 분위기는?</div><div id="meters" class="meters"></div></section><section class="qs"><div class="sect"><span>♡</span> 트친이 보는 우리 둘</div><div id="qgrid" class="qgrid"></div></section><footer id="footer" class="foot">전부 채우지 않아도 괜찮아요. 쓰고 싶은 항목만 자유롭게 작성해주세요 ♡</footer></article></div></section>
 </main>
 <div id="toast" class="toast"></div>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+
 <script>
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const firebaseConfig={
+  apiKey:"AIzaSyDxHoReGJVBh-574v4cYSpq2GiPgs3TaOg",
+  authDomain:"dearly-message.firebaseapp.com",
+  projectId:"dearly-message",
+  storageBucket:"dearly-message.firebasestorage.app",
+  messagingSenderId:"864968097858",
+  appId:"1:864968097858:web:e60e44cd381ca3a7e9addb",
+  measurementId:"G-T79KM8496B"
+};
+let fbAuth=null,fbDb=null;
+try{
+  if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);
+  fbAuth=firebase.auth();
+  fbDb=firebase.firestore();
+}catch(e){console.error("Firebase init failed",e)}
+let respondMode=false,sharedSheetId="";
+let answers=[],meterRatings=[];
+
 let qs=['이 페어의 첫인상은?','지금은 어떻게 보여?','한 단어로 표현한다면?','가장 먼저 떠오르는 색은?','가장 어울리는 계절은?','둘의 관계에서 제일 좋아하는 부분','가장 기억에 남는 설정이나 장면','먼저 좋아했을 것 같은 쪽','질투가 더 많아 보이는 쪽','상대를 더 많이 봐주는 쪽','어울리는 노래 한 곡','이 둘은 결국 ______할 것 같다','이 페어의 최고 매력 포인트','한 줄 평'];
 let meters=['달달함','애틋함','안정감','긴장감','집착','개그','서사맛'];
 let currentPattern='none';
@@ -43,11 +91,46 @@ const fontMap={default:'"Pretendard","Noto Sans KR","Apple SD Gothic Neo","Malgu
 function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('show'),1800)}
 function esc(t=''){return String(t).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
 function isWide(i){return [5,6,11,12,13].includes(i)}
-function renderQ(){const e=$('#qedit'),p=$('#qgrid');e.innerHTML='';p.innerHTML='';qs.forEach((q,i)=>{const r=document.createElement('div');r.className='qrow';r.innerHTML=`<span>${i+1}</span><input value="${esc(q)}" data-q="${i}"><button class="x" data-delq="${i}" type="button">×</button>`;e.appendChild(r);const b=document.createElement('div');b.className='qbox'+(isWide(i)?' wide':'');b.dataset.previewQ=i;b.innerHTML=`<div class="q">${esc(q)}</div><div class="lines"><i></i><i></i>${isWide(i)?'<i></i>':''}</div>`;p.appendChild(b)})}
-function renderM(){const e=$('#medit'),p=$('#meters');e.innerHTML='';p.innerHTML='';meters.forEach((m,i)=>{const r=document.createElement('div');r.className='qrow';r.innerHTML=`<span>♡</span><input value="${esc(m)}" data-m="${i}"><button class="x" data-delm="${i}" type="button">×</button>`;e.appendChild(r);const d=document.createElement('div');d.className='meter';d.dataset.previewM=i;d.innerHTML=`<strong>${esc(m)}</strong><div class="hearts">♡ ♡ ♡ ♡ ♡</div>`;p.appendChild(d)})}
+function renderQ(){
+  const e=$('#qedit'),p=$('#qgrid');e.innerHTML='';p.innerHTML='';
+  qs.forEach((q,i)=>{
+    const r=document.createElement('div');r.className='qrow';
+    r.innerHTML=`<span>${i+1}</span><input value="${esc(q)}" data-q="${i}"><button class="x" data-delq="${i}" type="button">×</button>`;e.appendChild(r);
+    const b=document.createElement('div');b.className='qbox'+(isWide(i)?' wide':'');b.dataset.previewQ=i;
+    const answer=respondMode?(answers[i]||''):'';
+    b.innerHTML=`<div class="q">${esc(q)}</div>${answer?`<div class="answerText">${esc(answer)}</div>`:`<div class="lines"><i></i><i></i>${isWide(i)?'<i></i>':''}</div>`}`;
+    p.appendChild(b);
+  });
+}
+function renderM(){
+  const e=$('#medit'),p=$('#meters');e.innerHTML='';p.innerHTML='';
+  meters.forEach((m,i)=>{
+    const r=document.createElement('div');r.className='qrow';
+    r.innerHTML=`<span>♡</span><input value="${esc(m)}" data-m="${i}"><button class="x" data-delm="${i}" type="button">×</button>`;e.appendChild(r);
+    const d=document.createElement('div');d.className='meter';d.dataset.previewM=i;
+    const rating=respondMode?Number(meterRatings[i]||0):0;
+    d.innerHTML=`<strong>${esc(m)}</strong><div class="hearts">${[1,2,3,4,5].map(n=>n<=rating?'♥':'♡').join(' ')}</div>`;p.appendChild(d);
+  });
+}
 function sync(){pPair.textContent=pair.value||'PAIR NAME';pRelation.textContent=relation.value||'관계 한 줄';pNameA.textContent=nameA.value||'캐릭터 A';pNameB.textContent=nameB.value||'캐릭터 B';pQuoteA.textContent=quoteA.value||'캐릭터 A의 한 줄 대사';pQuoteB.textContent=quoteB.value||'캐릭터 B의 한 줄 대사';pWorld.textContent=world.value||'세계관 / 장르'}
 function hexToRgba(hex,a){let h=hex.replace('#','');if(h.length===3)h=h.split('').map(x=>x+x).join('');const n=parseInt(h,16);return `rgba(${(n>>16)&255},${(n>>8)&255},${n&255},${a})`}
-function patternCss(kind){const c=hexToRgba(accentc.value,1);const faint=hexToRgba(accentc.value,.55);switch(kind){case'heart':return `radial-gradient(circle at 30% 35%, ${c} 0 1.4px, transparent 1.7px),radial-gradient(circle at 70% 65%, ${c} 0 1.4px, transparent 1.7px)`;case'dot':return `radial-gradient(circle, ${c} 0 1.2px, transparent 1.5px)`;case'check':return `linear-gradient(90deg,${faint} 1px,transparent 1px),linear-gradient(${faint} 1px,transparent 1px)`;case'stripe':return `repeating-linear-gradient(135deg,transparent 0 8px,${faint} 8px 10px)`;case'star':return `radial-gradient(circle at 50% 50%,${c} 0 1px,transparent 1.4px),radial-gradient(circle at 20% 20%,${c} 0 .7px,transparent 1.1px)`;case'lace':return `radial-gradient(circle at 50% 100%,transparent 0 7px,${faint} 7.5px 9px,transparent 9.5px)`;default:return'none'}}
+function patternCss(kind){
+  const c=accentc.value;
+  const solid=hexToRgba(accentc.value,1);
+  const faint=hexToRgba(accentc.value,.55);
+  switch(kind){
+    case'heart':{
+      const svg=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="M16 27C14.7 25.6 5.2 20 5.2 11.8C5.2 7.5 8.3 4.8 11.7 4.8C13.8 4.8 15.3 6 16 7.2C16.7 6 18.2 4.8 20.3 4.8C23.7 4.8 26.8 7.5 26.8 11.8C26.8 20 17.3 25.6 16 27Z" fill="none" stroke="${c}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+      return svgData(svg);
+    }
+    case'dot':return `radial-gradient(circle, ${solid} 0 1.2px, transparent 1.5px)`;
+    case'check':return `linear-gradient(90deg,${faint} 1px,transparent 1px),linear-gradient(${faint} 1px,transparent 1px)`;
+    case'stripe':return `repeating-linear-gradient(135deg,transparent 0 8px,${faint} 8px 10px)`;
+    case'star':return `radial-gradient(circle at 50% 50%,${solid} 0 1px,transparent 1.4px),radial-gradient(circle at 20% 20%,${solid} 0 .7px,transparent 1.1px)`;
+    case'lace':return `radial-gradient(circle at 50% 100%,transparent 0 7px,${faint} 7.5px 9px,transparent 9.5px)`;
+    default:return'none';
+  }
+}
 function applyPattern(){patternLayer.style.backgroundImage=patternCss(currentPattern);sheet.style.setProperty('--patternOpacity',patternOpacity.value);sheet.style.setProperty('--patternSize',patternSize.value+'px');patternLayer.style.backgroundSize=patternSize.value+'px '+patternSize.value+'px'}
 function apply(){const s=$('#sheet');s.style.setProperty('--bg',bgc.value);s.style.setProperty('--card',cardc.value);s.style.setProperty('--accent',accentc.value);s.style.setProperty('--text',textc.value);s.style.setProperty('--radius',radius.value+'px');s.style.setProperty('--border',border.value+'px');s.style.setProperty('--pairSize',pairSize.value+'px');s.style.setProperty('--body',bodySize.value+'px');s.style.setProperty('--quote',quoteSize.value+'px');s.style.setProperty('--question',questionSize.value+'px');s.style.setProperty('--lh',line.value);s.style.setProperty('--pad',pad.value+'px');s.style.setProperty('--photoGap',gap.value+'px');s.style.setProperty('--shadow',{soft:'0 16px 42px rgba(91,49,68,.13)',mid:'0 20px 50px rgba(70,42,55,.2)',strong:'0 25px 60px rgba(45,28,36,.3)',none:'none'}[shadow.value]);s.style.setProperty('--font',fontMap[font.value]||fontMap.default);const chars={heart:['♡','♡'],star:['✦','✧'],ribbon:['୨୧','୨୧'],flower:['❀','✿'],sparkle:['⋆','✧'],none:['','']}[decor.value];$('.da').textContent=chars[0];$('.db').textContent=chars[1];for(const b of [boxA,boxB]){b.className='photo '+shape.value}pRelation.style.display=showRelation.checked?'':'none';worldRow.style.display=showWorld.checked?'':'none';metersSec.style.display=showMeters.checked?'':'none';footer.style.display=showFooter.checked?'':'none';applyPattern()}
 function theme(k){const t=themes[k];bgc.value=t[0];cardc.value=t[1];accentc.value=t[2];textc.value=t[3];$$('.theme').forEach(b=>b.classList.toggle('active',b.dataset.theme===k));apply()}
@@ -55,8 +138,115 @@ function selectPattern(k){currentPattern=k;$$('.patternBtn').forEach(b=>b.classL
 function photo(file,w){if(!file)return;const r=new FileReader();r.onload=()=>{const img=$('#img'+w),box=$('#box'+w);img.src=r.result;box.classList.add('has');trans(w)};r.readAsDataURL(file)}
 function trans(w){const img=$('#img'+w);img.style.objectPosition=$('#x'+w).value+'% '+$('#y'+w).value+'%';img.style.transform='scale('+$('#zoom'+w).value+')'}
 async function fontLoad(file){if(!file)return;try{const face=new FontFace('UserCustomFont',await file.arrayBuffer());await face.load();document.fonts.add(face);font.value='custom';apply();toast('폰트를 적용했어요.')}catch(e){console.error(e);toast('폰트를 불러오지 못했어요.')}}
+
+async function compressImageForShare(src,maxSide=260,quality=.62){
+  if(!src)return'';
+  try{
+    const img=new Image();await new Promise((ok,no)=>{img.onload=ok;img.onerror=no;img.src=src});
+    const scale=Math.min(1,maxSide/Math.max(img.naturalWidth,img.naturalHeight));
+    const w=Math.max(1,Math.round(img.naturalWidth*scale)),h=Math.max(1,Math.round(img.naturalHeight*scale));
+    const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);
+    let data=c.toDataURL('image/webp',quality);if(!data.startsWith('data:image/webp'))data=c.toDataURL('image/jpeg',quality);
+    return data;
+  }catch(e){console.error(e);return''}
+}
+function val(id){return $('#'+id)?.value??''}
+function checked(id){return !!$('#'+id)?.checked}
+async function buildTemplate(){
+  const imageA=$('#boxA').classList.contains('has')?await compressImageForShare($('#imgA').src):'';
+  const imageB=$('#boxB').classList.contains('has')?await compressImageForShare($('#imgB').src):'';
+  return{
+    version:2,
+    basic:{pair:val('pair'),relation:val('relation'),nameA:val('nameA'),nameB:val('nameB'),quoteA:val('quoteA'),quoteB:val('quoteB'),world:val('world')},
+    images:{a:imageA,b:imageB},
+    photo:{zoomA:val('zoomA'),xA:val('xA'),yA:val('yA'),zoomB:val('zoomB'),xB:val('xB'),yB:val('yB'),shape:val('shape'),gap:val('gap')},
+    design:{
+      bgc:val('bgc'),cardc:val('cardc'),accentc:val('accentc'),textc:val('textc'),radius:val('radius'),border:val('border'),
+      shadow:val('shadow'),decor:val('decor'),pattern:currentPattern,patternOpacity:val('patternOpacity'),patternSize:val('patternSize'),
+      font:val('font')==='custom'?'default':val('font'),pairSize:val('pairSize'),bodySize:val('bodySize'),quoteSize:val('quoteSize'),
+      questionSize:val('questionSize'),line:val('line'),pad:val('pad'),width:val('width'),
+      showRelation:checked('showRelation'),showWorld:checked('showWorld'),showMeters:checked('showMeters'),showFooter:checked('showFooter')
+    },
+    questions:[...qs],meters:[...meters]
+  };
+}
+async function ensureAnonymous(){
+  if(!fbAuth)throw new Error('auth unavailable');
+  if(fbAuth.currentUser)return fbAuth.currentUser;
+  const result=await fbAuth.signInAnonymously();return result.user;
+}
+async function createShareLink(){
+  if(!fbDb)return toast('공유 링크 연결을 불러오지 못했어요.');
+  const b=$('#share'),old=b.textContent;b.classList.add('shareLoading');b.textContent='링크 만드는 중…';
+  try{
+    const user=await ensureAnonymous(),template=await buildTemplate();
+    if(new Blob([JSON.stringify(template)]).size>850000)throw new Error('template-too-large');
+    const ref=await fbDb.collection('pairSheets').add({ownerUid:user.uid,createdAt:firebase.firestore.FieldValue.serverTimestamp(),template});
+    const u=new URL(location.href);u.search='';u.hash='';u.searchParams.set('sheet',ref.id);
+    try{await navigator.clipboard.writeText(u.toString());toast('트친용 링크를 복사했어요 ♡')}
+    catch(e){prompt('아래 링크를 복사해 주세요.',u.toString())}
+  }catch(e){
+    console.error(e);
+    toast(String(e?.message||'').includes('template-too-large')?'사진 용량이 너무 커요. 더 작은 사진으로 바꿔주세요.':'링크를 만들지 못했어요. Firestore 설정을 확인해 주세요.');
+  }finally{b.classList.remove('shareLoading');b.textContent=old}
+}
+function setField(id,v,isCheck=false){const e=$('#'+id);if(!e)return;if(isCheck)e.checked=!!v;else if(v!==undefined&&v!==null)e.value=String(v)}
+function setSharedImage(w,src){if(!src)return;const img=$('#img'+w),box=$('#box'+w);img.src=src;box.classList.add('has');trans(w)}
+function applySharedTemplate(t){
+  const b=t.basic||{},ph=t.photo||{},d=t.design||{};
+  for(const [id,v] of Object.entries({pair:b.pair,relation:b.relation,nameA:b.nameA,nameB:b.nameB,quoteA:b.quoteA,quoteB:b.quoteB,world:b.world}))setField(id,v);
+  ['zoomA','xA','yA','zoomB','xB','yB','shape','gap'].forEach(id=>setField(id,ph[id]));
+  ['bgc','cardc','accentc','textc','radius','border','shadow','decor','patternOpacity','patternSize','font','pairSize','bodySize','quoteSize','questionSize','line','pad','width'].forEach(id=>setField(id,d[id]));
+  setField('showRelation',d.showRelation,true);setField('showWorld',d.showWorld,true);setField('showMeters',d.showMeters,true);setField('showFooter',d.showFooter,true);
+  qs=Array.isArray(t.questions)&&t.questions.length?t.questions:qs;meters=Array.isArray(t.meters)&&t.meters.length?t.meters:meters;
+  currentPattern=d.pattern||'none';answers=new Array(qs.length).fill('');meterRatings=new Array(meters.length).fill(0);
+  sync();apply();selectPattern(currentPattern);setSharedImage('A',t.images?.a||'');setSharedImage('B',t.images?.b||'');
+}
+function responseStorageKey(){return sharedSheetId?`dearly-pair-response:${sharedSheetId}`:''}
+function loadSavedResponses(){
+  try{
+    const raw=localStorage.getItem(responseStorageKey());if(!raw)return;const s=JSON.parse(raw);
+    if(Array.isArray(s.answers))answers=qs.map((_,i)=>s.answers[i]||'');
+    if(Array.isArray(s.ratings))meterRatings=meters.map((_,i)=>Number(s.ratings[i]||0));
+  }catch(e){console.error(e)}
+}
+function saveResponses(){try{if(responseStorageKey())localStorage.setItem(responseStorageKey(),JSON.stringify({answers,ratings:meterRatings}))}catch(e){}}
+function renderAnswerEditor(){
+  const aq=$('#answerQuestions');aq.innerHTML='';
+  qs.forEach((q,i)=>{const d=document.createElement('div');d.className='answerField';d.innerHTML=`<label>${esc(q)}<textarea rows="${isWide(i)?4:3}" data-answer="${i}" placeholder="자유롭게 적어주세요.">${esc(answers[i]||'')}</textarea></label>`;aq.appendChild(d)});
+  const am=$('#answerMeters');am.innerHTML='';
+  meters.forEach((m,i)=>{const d=document.createElement('div');d.className='answerMeter';const r=Number(meterRatings[i]||0);d.innerHTML=`<strong>${esc(m)}</strong><div class="rating">${[1,2,3,4,5].map(n=>`<button type="button" class="heartRate ${n<=r?'on':''}" data-rate-i="${i}" data-rate="${n}">${n<=r?'♥':'♡'}</button>`).join('')}</div>`;am.appendChild(d)});
+}
+function updateAnswerPreview(i){const b=$(`[data-preview-q="${i}"]`);if(!b)return;const a=answers[i]||'';b.innerHTML=`<div class="q">${esc(qs[i]||'')}</div>${a?`<div class="answerText">${esc(a)}</div>`:`<div class="lines"><i></i><i></i>${isWide(i)?'<i></i>':''}</div>`}`}
+function updateMeterPreview(i){const d=$(`[data-preview-m="${i}"]`);if(!d)return;const r=Number(meterRatings[i]||0);d.innerHTML=`<strong>${esc(meters[i]||'')}</strong><div class="hearts">${[1,2,3,4,5].map(n=>n<=r?'♥':'♡').join(' ')}</div>`}
+function enterRespondMode(){
+  respondMode=true;document.body.classList.add('respondMode');$('#creatorEditor').hidden=true;$('#answerEditor').hidden=false;$('#share').hidden=true;
+  $('#reset').textContent='답변 초기화';$('#siteGuide').textContent='트친이 공유한 페어틀이에요. 아래에서 자유롭게 답하고 결과를 PNG로 저장해 주세요 ♡';
+  loadSavedResponses();renderQ();renderM();renderAnswerEditor();
+  $('#reset').onclick=()=>{if(!confirm('작성한 답변을 모두 지울까요?'))return;answers=new Array(qs.length).fill('');meterRatings=new Array(meters.length).fill(0);localStorage.removeItem(responseStorageKey());renderQ();renderM();renderAnswerEditor();toast('답변을 초기화했어요.')};
+}
+async function loadSharedSheet(){
+  const id=new URL(location.href).searchParams.get('sheet');if(!id)return false;sharedSheetId=id;
+  if(!fbDb){toast('공유된 페어틀을 불러오지 못했어요.');return false}
+  try{
+    const snap=await fbDb.collection('pairSheets').doc(id).get();if(!snap.exists)throw new Error('not-found');
+    applySharedTemplate(snap.data().template||{});enterRespondMode();return true;
+  }catch(e){console.error(e);toast('공유된 페어틀을 찾지 못했어요.');return false}
+}
+
 function fitPreview(){if(innerWidth>600){sheet.style.transform='';sheet.style.marginBottom='';return}const scale=Math.min(1,($('.stage').clientWidth-4)/860);sheet.style.transform=`scale(${scale})`;sheet.style.marginBottom=-(sheet.offsetHeight*(1-scale))+'px'}
 async function save(){if(typeof html2canvas!=='function')return toast('PNG 저장 모듈을 불러오지 못했어요.');const old=sheet.style.transform,oldm=sheet.style.marginBottom;sheet.style.transform='none';sheet.style.marginBottom='0';try{await document.fonts.ready;const scale=Number(width.value)/sheet.offsetWidth;const c=await html2canvas(sheet,{scale,useCORS:true,backgroundColor:null,logging:false});const a=document.createElement('a');a.download=((pair.value||'pair').replace(/[\\/:*?"<>|]/g,'_'))+'-우리페어어떻게보여.png';a.href=c.toDataURL('image/png');a.click();toast('PNG로 저장했어요.')}catch(e){console.error(e);toast('PNG 저장에 실패했어요.')}finally{sheet.style.transform=old;sheet.style.marginBottom=oldm}}
-['pair','relation','nameA','nameB','quoteA','quoteB','world'].forEach(id=>$('#'+id).addEventListener('input',sync));['bgc','cardc','accentc','textc','radius','border','shadow','decor','pairSize','bodySize','quoteSize','questionSize','line','pad','gap','shape','font','showRelation','showWorld','showMeters','showFooter','patternOpacity','patternSize'].forEach(id=>$('#'+id).addEventListener('input',apply));$('.themes').addEventListener('click',e=>{const b=e.target.closest('.theme');if(b)theme(b.dataset.theme)});$('.patterns').addEventListener('click',e=>{const b=e.target.closest('.patternBtn');if(b)selectPattern(b.dataset.pattern)});fileA.onchange=e=>photo(e.target.files[0],'A');fileB.onchange=e=>photo(e.target.files[0],'B');['zoomA','xA','yA'].forEach(id=>$('#'+id).addEventListener('input',()=>trans('A')));['zoomB','xB','yB'].forEach(id=>$('#'+id).addEventListener('input',()=>trans('B')));fontFile.onchange=e=>fontLoad(e.target.files[0]);qedit.addEventListener('input',e=>{if(e.target.dataset.q!==undefined){const i=+e.target.dataset.q;qs[i]=e.target.value;const q=$(`[data-preview-q="${i}"] .q`);if(q)q.textContent=e.target.value}});qedit.addEventListener('click',e=>{if(e.target.dataset.delq!==undefined){if(qs.length<=1)return toast('질문은 한 개 이상 필요해요.');qs.splice(+e.target.dataset.delq,1);renderQ()}});medit.addEventListener('input',e=>{if(e.target.dataset.m!==undefined){const i=+e.target.dataset.m;meters[i]=e.target.value;const m=$(`[data-preview-m="${i}"] strong`);if(m)m.textContent=e.target.value}});medit.addEventListener('click',e=>{if(e.target.dataset.delm!==undefined){if(meters.length<=1)return toast('항목은 한 개 이상 필요해요.');meters.splice(+e.target.dataset.delm,1);renderM()}});addQ.onclick=()=>{qs.push('새 질문');renderQ()};addM.onclick=()=>{meters.push('새 항목');renderM()};png.onclick=save;fit.onclick=fitPreview;reset.onclick=()=>{if(confirm('입력한 내용과 꾸미기 설정을 초기화할까요?'))location.reload()};addEventListener('resize',fitPreview);renderQ();renderM();sync();theme('milk');selectPattern('none');apply();setTimeout(fitPreview,50);
+
+answerQuestions.addEventListener('input',e=>{
+  if(e.target.dataset.answer===undefined)return;
+  const i=Number(e.target.dataset.answer);answers[i]=e.target.value;updateAnswerPreview(i);saveResponses();
+});
+answerMeters.addEventListener('click',e=>{
+  const b=e.target.closest('[data-rate]');if(!b)return;
+  const i=Number(b.dataset.rateI),n=Number(b.dataset.rate);meterRatings[i]=meterRatings[i]===n?0:n;
+  renderAnswerEditor();updateMeterPreview(i);saveResponses();
+});
+share.onclick=createShareLink;
+['pair','relation','nameA','nameB','quoteA','quoteB','world'].forEach(id=>$('#'+id).addEventListener('input',sync));['bgc','cardc','accentc','textc','radius','border','shadow','decor','pairSize','bodySize','quoteSize','questionSize','line','pad','gap','shape','font','showRelation','showWorld','showMeters','showFooter','patternOpacity','patternSize'].forEach(id=>$('#'+id).addEventListener('input',apply));$('.themes').addEventListener('click',e=>{const b=e.target.closest('.theme');if(b)theme(b.dataset.theme)});$('.patterns').addEventListener('click',e=>{const b=e.target.closest('.patternBtn');if(b)selectPattern(b.dataset.pattern)});fileA.onchange=e=>photo(e.target.files[0],'A');fileB.onchange=e=>photo(e.target.files[0],'B');['zoomA','xA','yA'].forEach(id=>$('#'+id).addEventListener('input',()=>trans('A')));['zoomB','xB','yB'].forEach(id=>$('#'+id).addEventListener('input',()=>trans('B')));fontFile.onchange=e=>fontLoad(e.target.files[0]);qedit.addEventListener('input',e=>{if(e.target.dataset.q!==undefined){const i=+e.target.dataset.q;qs[i]=e.target.value;const q=$(`[data-preview-q="${i}"] .q`);if(q)q.textContent=e.target.value}});qedit.addEventListener('click',e=>{if(e.target.dataset.delq!==undefined){if(qs.length<=1)return toast('질문은 한 개 이상 필요해요.');qs.splice(+e.target.dataset.delq,1);renderQ()}});medit.addEventListener('input',e=>{if(e.target.dataset.m!==undefined){const i=+e.target.dataset.m;meters[i]=e.target.value;const m=$(`[data-preview-m="${i}"] strong`);if(m)m.textContent=e.target.value}});medit.addEventListener('click',e=>{if(e.target.dataset.delm!==undefined){if(meters.length<=1)return toast('항목은 한 개 이상 필요해요.');meters.splice(+e.target.dataset.delm,1);renderM()}});addQ.onclick=()=>{qs.push('새 질문');renderQ()};addM.onclick=()=>{meters.push('새 항목');renderM()};png.onclick=save;fit.onclick=fitPreview;reset.onclick=()=>{if(confirm('입력한 내용과 꾸미기 설정을 초기화할까요?'))location.reload()};addEventListener('resize',fitPreview);renderQ();renderM();sync();theme('milk');selectPattern('none');apply();loadSharedSheet().finally(()=>setTimeout(fitPreview,50));
 </script>
 </body></html>
