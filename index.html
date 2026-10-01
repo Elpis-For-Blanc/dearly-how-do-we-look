@@ -74,10 +74,15 @@ body.ownerMode .bar span:after{content:" · 주인 전용";color:var(--u)}
   .copyRow .btn{width:100%}
 }
 
+
+.shareState{display:block;min-width:100%;font-size:11px;color:var(--muted);line-height:1.45}
+.shareState.error{color:#b84f72}
+.shareState.ok{color:#5f8a68}
+
 </style>
 </head>
 <body>
-<header class="top"><div><h1>우리 페어, 어떻게 보여?</h1><p id="siteGuide">사진과 기본 정보만 채워 올리고, 나머지는 트친들이 자유롭게 작성하는 페어 인상틀입니다 ♡</p></div><div class="actions"><button id="reset" class="btn">초기화</button><button id="share" class="btn">트친용 링크 만들기</button><button id="png" class="btn primary">PNG 저장</button></div></header>
+<header class="top"><div><h1>우리 페어, 어떻게 보여?</h1><p id="siteGuide">사진과 기본 정보만 채워 올리고, 나머지는 트친들이 자유롭게 작성하는 페어 인상틀입니다 ♡</p></div><div class="actions"><button id="reset" class="btn">초기화</button><button id="share" class="btn" type="button">트친용 링크 만들기</button><button id="png" class="btn primary" type="button">PNG 저장</button><span id="shareState" class="shareState" aria-live="polite"></span></div></header>
 <main class="layout">
 <aside id="creatorEditor" class="editor">
 <section class="panel"><div class="ph"><h2>페어 정보</h2><small>완성되는 틀에 표시됩니다.</small></div><label>페어명<input id="pair" type="text" placeholder="예: BLANC × ELPIS"></label><label>관계 한 줄<input id="relation" type="text" placeholder="예: 서로의 유일한 페어"></label><div class="two"><label>캐릭터 A 이름<input id="nameA" type="text" placeholder="캐릭터 A"></label><label>캐릭터 B 이름<input id="nameB" type="text" placeholder="캐릭터 B"></label></div><div class="two"><label>캐릭터 A 한 줄 대사<input id="quoteA" type="text" maxlength="80" placeholder="캐릭터다운 한마디"></label><label>캐릭터 B 한 줄 대사<input id="quoteB" type="text" maxlength="80" placeholder="캐릭터다운 한마디"></label></div><label>세계관 / 장르<input id="world" type="text" placeholder="예: 현대 판타지 · 센티넬버스"></label></section>
@@ -220,7 +225,7 @@ function renderQ(){
     const r=document.createElement('div');r.className='qrow';
     r.innerHTML=`<span>${i+1}</span><input value="${esc(q)}" data-q="${i}"><button class="x" data-delq="${i}" type="button">×</button>`;e.appendChild(r);
     const b=document.createElement('div');b.className='qbox'+(isWide(i)?' wide':'');b.dataset.previewQ=i;
-    const answer=respondMode?(answers[i]||''):'';
+    const answer=(respondMode||ownerMode)?(answers[i]||''):'';
     b.innerHTML=`<div class="q">${esc(q)}</div>${answer?`<div class="answerText">${esc(answer)}</div>`:`<div class="lines"><i></i><i></i>${isWide(i)?'<i></i>':''}</div>`}`;
     p.appendChild(b);
   });
@@ -231,7 +236,7 @@ function renderM(){
     const r=document.createElement('div');r.className='qrow';
     r.innerHTML=`<span>♡</span><input value="${esc(m)}" data-m="${i}"><button class="x" data-delm="${i}" type="button">×</button>`;e.appendChild(r);
     const d=document.createElement('div');d.className='meter';d.dataset.previewM=i;
-    const rating=respondMode?Number(meterRatings[i]||0):0;
+    const rating=(respondMode||ownerMode)?Number(meterRatings[i]||0):0;
     d.innerHTML=`<strong>${esc(m)}</strong><div class="hearts">${[1,2,3,4,5].map(n=>n<=rating?'♥':'♡').join(' ')}</div>`;p.appendChild(d);
   });
 }
@@ -323,6 +328,12 @@ async function copyText(value,msg){
     prompt('아래 링크를 복사해 주세요.',value);
   }
 }
+function setShareState(message,type=''){
+  const el=$('#shareState');
+  if(!el)return;
+  el.textContent=message||'';
+  el.className='shareState'+(type?` ${type}`:'');
+}
 function rememberOwnedSheet(id,pairName){
   try{
     const key='dearly-pair-owned-sheets';
@@ -331,39 +342,122 @@ function rememberOwnedSheet(id,pairName){
     localStorage.setItem(key,JSON.stringify(list.slice(0,30)));
   }catch(e){console.error(e)}
 }
-async function createShareLink(){
-  if(!fbDb)return toast('공유 링크 연결을 불러오지 못했어요.');
-  const b=$('#share'),old=b.textContent;b.classList.add('shareLoading');b.textContent='링크 만드는 중…';
-  try{
-    const user=await ensureAnonymous(),template=await buildTemplate();
-    if(new Blob([JSON.stringify(template)]).size>850000)throw new Error('template-too-large');
+async function ensureFirebaseReady(){
+  if(typeof firebase==='undefined')throw new Error('firebase-library-missing');
+  if(!fbAuth||!fbDb)throw new Error('firebase-init-failed');
+  return true;
+}
+async function ensureAnonymous(){
+  await ensureFirebaseReady();
 
-    const ref=await fbDb.collection('pairSheets').add({
+  if(fbAuth.currentUser)return fbAuth.currentUser;
+
+  const existing=await new Promise(resolve=>{
+    let settled=false;
+    let off=()=>{};
+    off=fbAuth.onAuthStateChanged(user=>{
+      if(settled)return;
+      settled=true;
+      try{off()}catch(e){}
+      resolve(user||null);
+    });
+    setTimeout(()=>{
+      if(settled)return;
+      settled=true;
+      try{off()}catch(e){}
+      resolve(fbAuth.currentUser||null);
+    },1500);
+  });
+
+  if(existing)return existing;
+
+  const result=await fbAuth.signInAnonymously();
+  if(!result?.user)throw new Error('anonymous-signin-failed');
+  return result.user;
+}
+function friendlyShareError(error){
+  const code=String(error?.code||'');
+  const msg=String(error?.message||'');
+  console.error('Share link error:', error);
+
+  if(code.includes('permission-denied')||msg.includes('permission-denied')){
+    return 'Firebase 규칙에서 링크 저장이 막혀 있어요. ZIP 안의 firestore.rules.txt로 규칙을 업데이트해 주세요.';
+  }
+  if(code.includes('operation-not-allowed')){
+    return 'Firebase에서 익명 로그인이 꺼져 있어요. Authentication → Sign-in method에서 Anonymous를 켜 주세요.';
+  }
+  if(code.includes('auth/unauthorized-domain')){
+    return 'Firebase Authentication의 승인된 도메인에 현재 GitHub Pages 주소를 추가해 주세요.';
+  }
+  if(msg.includes('firebase-library-missing')||msg.includes('firebase-init-failed')){
+    return 'Firebase 연결 파일을 불러오지 못했어요. 인터넷 연결 후 다시 시도해 주세요.';
+  }
+  if(msg.includes('template-too-large')){
+    return '사진 용량이 너무 커요. 더 작은 사진으로 바꿔 주세요.';
+  }
+  if(code.includes('unavailable')||msg.includes('network')){
+    return '네트워크 연결을 확인한 뒤 다시 시도해 주세요.';
+  }
+  return '링크를 만들지 못했어요. 잠시 뒤 다시 시도해 주세요.';
+}
+async function createShareLink(){
+  const b=$('#share');
+  if(!b)return;
+
+  const old=b.textContent;
+  b.disabled=true;
+  b.classList.add('shareLoading');
+  b.textContent='링크 만드는 중…';
+  setShareState('Firebase에 틀을 저장하고 있어요…');
+
+  try{
+    await ensureFirebaseReady();
+    const user=await ensureAnonymous();
+    const template=await buildTemplate();
+
+    const bytes=new Blob([JSON.stringify(template)]).size;
+    if(bytes>850000)throw new Error('template-too-large');
+
+    const payload={
       ownerUid:user.uid,
       createdAt:firebase.firestore.FieldValue.serverTimestamp(),
       template
-    });
+    };
+
+    const ref=await fbDb.collection('pairSheets').add(payload);
+    if(!ref?.id)throw new Error('sheet-id-missing');
 
     rememberOwnedSheet(ref.id,template.basic?.pair||'');
 
     const friendUrl=new URL(location.href);
-    friendUrl.search='';friendUrl.hash='';
+    friendUrl.search='';
+    friendUrl.hash='';
     friendUrl.searchParams.set('sheet',ref.id);
 
     const ownerUrl=new URL(location.href);
-    ownerUrl.search='';ownerUrl.hash='';
+    ownerUrl.search='';
+    ownerUrl.hash='';
     ownerUrl.searchParams.set('owner',ref.id);
 
     $('#friendLinkOutput').value=friendUrl.toString();
     $('#ownerLinkOutput').value=ownerUrl.toString();
-    $('#linkDialog').showModal();
+
+    setShareState('링크를 만들었어요 ♡','ok');
+
+    const dlg=$('#linkDialog');
+    if(dlg?.showModal) dlg.showModal();
+    else{
+      await copyText(friendUrl.toString(),'트친용 링크를 복사했어요 ♡');
+      prompt('주인용 링크는 본인만 보관해 주세요.',ownerUrl.toString());
+    }
   }catch(e){
-    console.error(e);
-    toast(String(e?.message||'').includes('template-too-large')
-      ?'사진 용량이 너무 커요. 더 작은 사진으로 바꿔주세요.'
-      :'링크를 만들지 못했어요. Firestore 설정을 확인해 주세요.');
+    const message=friendlyShareError(e);
+    setShareState(message,'error');
+    toast(message);
   }finally{
-    b.classList.remove('shareLoading');b.textContent=old;
+    b.disabled=false;
+    b.classList.remove('shareLoading');
+    b.textContent=old;
   }
 }
 function setField(id,v,isCheck=false){const e=$('#'+id);if(!e)return;if(isCheck)e.checked=!!v;else if(v!==undefined&&v!==null)e.value=String(v)}
@@ -518,29 +612,57 @@ function renderOwnerResponseList(){
 }
 function showOwnerResponse(r){
   if(!r)return;
+
   selectedOwnerResponseId=r.id;
   answers=qs.map((_,i)=>String(r.answers?.[i]||''));
   meterRatings=meters.map((_,i)=>Math.max(0,Math.min(5,Number(r.ratings?.[i]||0))));
-  renderQ();renderM();
+
+  // 주인 화면에서도 선택한 답변을 틀 미리보기에 바로 반영
+  renderQ();
+  renderM();
+
   $('#selectedResponseName').textContent=responseDisplayName(r);
   $('#selectedResponseMeta').textContent=`${formatResponseTime(r.submittedAt||r.updatedAt)} · 작성 ${responseAnswerCount(r)}개`;
   renderOwnerResponseList();
+
+  // 모바일에서 답변을 고르면 미리보기 위치가 너무 멀 수 있어,
+  // 렌더링 후 레이아웃을 다시 맞춰 줍니다.
+  setTimeout(fitPreview,0);
 }
 async function loadOwnerResponses(){
   const list=$('#responseList');
   list.innerHTML='<div class="responseEmpty">답변을 불러오는 중…</div>';
+
   try{
     const snap=await fbDb.collection('pairSheets').doc(sharedSheetId).collection('responses').get();
+
     currentOwnerResponses=snap.docs.map(d=>({id:d.id,...d.data()}))
       .sort((a,b)=>{
         const at=a.submittedAt?.toMillis?.()||a.updatedAt?.toMillis?.()||0;
         const bt=b.submittedAt?.toMillis?.()||b.updatedAt?.toMillis?.()||0;
         return bt-at;
       });
+
     renderOwnerResponseList();
+
     if(selectedOwnerResponseId){
       const selected=currentOwnerResponses.find(r=>r.id===selectedOwnerResponseId);
-      if(selected)showOwnerResponse(selected);
+      if(selected){
+        showOwnerResponse(selected);
+        return;
+      }
+    }
+
+    // 첫 진입 시 가장 최근 답변을 자동으로 미리보기에 표시
+    if(currentOwnerResponses.length){
+      showOwnerResponse(currentOwnerResponses[0]);
+    }else{
+      answers=new Array(qs.length).fill('');
+      meterRatings=new Array(meters.length).fill(0);
+      renderQ();
+      renderM();
+      $('#selectedResponseName').textContent='아직 선택하지 않았어요.';
+      $('#selectedResponseMeta').textContent='도착한 답변이 없습니다.';
     }
   }catch(e){
     console.error(e);
@@ -619,30 +741,36 @@ function fitPreview(){if(innerWidth>600){sheet.style.transform='';sheet.style.ma
 async function save(){if(typeof html2canvas!=='function')return toast('PNG 저장 모듈을 불러오지 못했어요.');const old=sheet.style.transform,oldm=sheet.style.marginBottom;sheet.style.transform='none';sheet.style.marginBottom='0';try{await document.fonts.ready;const scale=Number(width.value)/sheet.offsetWidth;const c=await html2canvas(sheet,{scale,useCORS:true,backgroundColor:null,logging:false});const a=document.createElement('a');a.download=((pair.value||'pair').replace(/[\\/:*?"<>|]/g,'_'))+'-우리페어어떻게보여.png';a.href=c.toDataURL('image/png');a.click();toast('PNG로 저장했어요.')}catch(e){console.error(e);toast('PNG 저장에 실패했어요.')}finally{sheet.style.transform=old;sheet.style.marginBottom=oldm}}
 
 
-identityMode.addEventListener('change',()=>{applyIdentityUi();saveResponses()});
-responderNickname.addEventListener('input',saveResponses);
-submitResponse.onclick=submitResponseToOwner;
+$('#identityMode').addEventListener('change',()=>{applyIdentityUi();saveResponses()});
+$('#responderNickname').addEventListener('input',saveResponses);
+$('#submitResponse').onclick=submitResponseToOwner;
 
-responseList.addEventListener('click',e=>{
+$('#responseList').addEventListener('click',e=>{
   const b=e.target.closest('[data-response-id]');
   if(!b)return;
   const r=currentOwnerResponses.find(x=>x.id===b.dataset.responseId);
   if(r)showOwnerResponse(r);
 });
-refreshResponses.onclick=loadOwnerResponses;
+$('#refreshResponses').onclick=loadOwnerResponses;
 
-copyFriendLink.onclick=()=>copyText(friendLinkOutput.value,'트친용 링크를 복사했어요 ♡');
-copyOwnerLink.onclick=()=>copyText(ownerLinkOutput.value,'주인용 링크를 복사했어요 ♡');
-answerQuestions.addEventListener('input',e=>{
+$('#copyFriendLink').onclick=()=>copyText($('#friendLinkOutput').value,'트친용 링크를 복사했어요 ♡');
+$('#copyOwnerLink').onclick=()=>copyText($('#ownerLinkOutput').value,'주인용 링크를 복사했어요 ♡');
+$('#answerQuestions').addEventListener('input',e=>{
   if(e.target.dataset.answer===undefined)return;
   const i=Number(e.target.dataset.answer);answers[i]=e.target.value;updateAnswerPreview(i);saveResponses();
 });
-answerMeters.addEventListener('click',e=>{
+$('#answerMeters').addEventListener('click',e=>{
   const b=e.target.closest('[data-rate]');if(!b)return;
   const i=Number(b.dataset.rateI),n=Number(b.dataset.rate);meterRatings[i]=meterRatings[i]===n?0:n;
   renderAnswerEditor();updateMeterPreview(i);saveResponses();
 });
-share.onclick=createShareLink;
-['pair','relation','nameA','nameB','quoteA','quoteB','world'].forEach(id=>$('#'+id).addEventListener('input',sync));['bgc','cardc','accentc','textc','radius','border','shadow','decor','pairSize','bodySize','quoteSize','questionSize','line','pad','gap','shape','font','showRelation','showWorld','showMeters','showFooter','patternOpacity','patternSize'].forEach(id=>$('#'+id).addEventListener('input',apply));$('.themes').addEventListener('click',e=>{const b=e.target.closest('.theme');if(b)theme(b.dataset.theme)});$('.patterns').addEventListener('click',e=>{const b=e.target.closest('.patternBtn');if(b)selectPattern(b.dataset.pattern)});fileA.onchange=e=>photo(e.target.files[0],'A');fileB.onchange=e=>photo(e.target.files[0],'B');['zoomA','xA','yA'].forEach(id=>$('#'+id).addEventListener('input',()=>trans('A')));['zoomB','xB','yB'].forEach(id=>$('#'+id).addEventListener('input',()=>trans('B')));fontFile.onchange=e=>fontLoad(e.target.files[0]);qedit.addEventListener('input',e=>{if(e.target.dataset.q!==undefined){const i=+e.target.dataset.q;qs[i]=e.target.value;const q=$(`[data-preview-q="${i}"] .q`);if(q)q.textContent=e.target.value}});qedit.addEventListener('click',e=>{if(e.target.dataset.delq!==undefined){if(qs.length<=1)return toast('질문은 한 개 이상 필요해요.');qs.splice(+e.target.dataset.delq,1);renderQ()}});medit.addEventListener('input',e=>{if(e.target.dataset.m!==undefined){const i=+e.target.dataset.m;meters[i]=e.target.value;const m=$(`[data-preview-m="${i}"] strong`);if(m)m.textContent=e.target.value}});medit.addEventListener('click',e=>{if(e.target.dataset.delm!==undefined){if(meters.length<=1)return toast('항목은 한 개 이상 필요해요.');meters.splice(+e.target.dataset.delm,1);renderM()}});addQ.onclick=()=>{qs.push('새 질문');renderQ()};addM.onclick=()=>{meters.push('새 항목');renderM()};png.onclick=save;fit.onclick=fitPreview;reset.onclick=()=>{if(confirm('입력한 내용과 꾸미기 설정을 초기화할까요?'))location.reload()};addEventListener('resize',fitPreview);renderQ();renderM();sync();theme('milk');selectPattern('none');apply();loadEntryMode().finally(()=>setTimeout(fitPreview,50));
+$('#share').onclick=createShareLink;
+['pair','relation','nameA','nameB','quoteA','quoteB','world'].forEach(id=>$('#'+id).addEventListener('input',sync));['bgc','cardc','accentc','textc','radius','border','shadow','decor','pairSize','bodySize','quoteSize','questionSize','line','pad','gap','shape','font','showRelation','showWorld','showMeters','showFooter','patternOpacity','patternSize'].forEach(id=>$('#'+id).addEventListener('input',apply));$('.themes').addEventListener('click',e=>{const b=e.target.closest('.theme');if(b)theme(b.dataset.theme)});$('.patterns').addEventListener('click',e=>{const b=e.target.closest('.patternBtn');if(b)selectPattern(b.dataset.pattern)});fileA.onchange=e=>photo(e.target.files[0],'A');fileB.onchange=e=>photo(e.target.files[0],'B');['zoomA','xA','yA'].forEach(id=>$('#'+id).addEventListener('input',()=>trans('A')));['zoomB','xB','yB'].forEach(id=>$('#'+id).addEventListener('input',()=>trans('B')));fontFile.onchange=e=>fontLoad(e.target.files[0]);qedit.addEventListener('input',e=>{if(e.target.dataset.q!==undefined){const i=+e.target.dataset.q;qs[i]=e.target.value;const q=$(`[data-preview-q="${i}"] .q`);if(q)q.textContent=e.target.value}});qedit.addEventListener('click',e=>{if(e.target.dataset.delq!==undefined){if(qs.length<=1)return toast('질문은 한 개 이상 필요해요.');qs.splice(+e.target.dataset.delq,1);renderQ()}});medit.addEventListener('input',e=>{if(e.target.dataset.m!==undefined){const i=+e.target.dataset.m;meters[i]=e.target.value;const m=$(`[data-preview-m="${i}"] strong`);if(m)m.textContent=e.target.value}});medit.addEventListener('click',e=>{if(e.target.dataset.delm!==undefined){if(meters.length<=1)return toast('항목은 한 개 이상 필요해요.');meters.splice(+e.target.dataset.delm,1);renderM()}});addQ.onclick=()=>{qs.push('새 질문');renderQ()};addM.onclick=()=>{meters.push('새 항목');renderM()};png.onclick=save;fit.onclick=fitPreview;reset.onclick=()=>{if(confirm('입력한 내용과 꾸미기 설정을 초기화할까요?'))location.reload()};addEventListener('resize',fitPreview);renderQ();renderM();sync();theme('milk');selectPattern('none');apply();
+setTimeout(()=>{
+  if(typeof firebase==='undefined'||!fbAuth||!fbDb){
+    setShareState('Firebase 연결을 불러오지 못했어요. 새로고침 후 다시 시도해 주세요.','error');
+  }
+},1200);
+loadEntryMode().finally(()=>setTimeout(fitPreview,50));
 </script>
 </body></html>
